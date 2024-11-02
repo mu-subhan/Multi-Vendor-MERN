@@ -1,13 +1,15 @@
 import React from "react";
+import {BrowserRouter,Routes,Route} from "react-router-dom";
+import {LoginPage} from './Routes.js';
 
 function App(){
   return(
-    <>
-   <h1 className="text-3xl text-blue-600 underline">
-      set up is ready 
-    </h1>
-  
-    </>
+<BrowserRouter>
+<Routes>
+  <Route path="/login" element = {<LoginPage />}/>
+</Routes>
+
+</BrowserRouter>
   )
 }
 export default App;
