@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
-import {AiOutlineEye, AiOutlineEyeInvisible} from 'react-icons/ai'
+import {AiOutlineEye, AiOutlineEyeInvisible} from 'react-icons/ai';
+import styles from '../../styles/styles';
+import {Link} from 'react-router-dom'
 
 const Login = () => {
     const [email,setEmail] = useState("");
@@ -52,7 +54,32 @@ const Login = () => {
                             }
                         </div>
                     </div>
-
+                <div className ={`${styles.noramlFlex} justify-between`}>
+                    <div className={`${styles.noramlFlex}`}>
+                        <input type='checkbox' name='remember-me' id='remember-me'
+                        className='h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded'/>
+                        <label htmlFor='remember-me' className='ml-2 block text-sm text-gray-900'>
+                            Remember me
+                        </label>
+                    </div>
+                    <div className='text-sm'>
+                        <a href='.forgot-password'
+                        className='font-medium text-blue-600 hover:text-blue-500'>
+                            Forgot your password
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <button 
+                    type='submit'
+                    className='group relative w-full h-[48px] flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700'>
+                        Submit
+                    </button>
+                </div>
+                <div className={`${styles.noramlFlex} w-full`}>
+                    <h3>Not have any account ?</h3>
+                    <Link to='/sign-up' className='text-blue-600 pl-2'>Sign Up</Link>
+                </div>
                 </form>
             </div>
         </div>
