@@ -96,6 +96,12 @@ const Signup = () => {
                  )
                                 }
                             </span>
+                            <label htmlFor='file-input' className='ml-5 flex items-center justify-center px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-400'>
+                                <span >Upload a file</span>
+                                <input type='file' name='avater' id='file-input' accept='.jpg,.jpeg,.png'
+                                onChange={handleFileInputChange}
+                                className='sr-only'/>
+                            </label>
                         </div>
                     </div>
                
@@ -107,8 +113,8 @@ const Signup = () => {
                     </button>
                 </div>
                 <div className={`${styles.noramlFlex} w-full`}>
-                    <h3>Not have any account ?</h3>
-                    <Link to='/sign-up' className='text-blue-600 pl-2'>Sign Up</Link>
+                    <h3>Already have an account?</h3>
+                    <Link to='/login' className='text-blue-600 pl-2'>Sign in</Link>
                 </div>
                 </form>
             </div>
