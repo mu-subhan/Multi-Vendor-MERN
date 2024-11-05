@@ -1,3 +1,5 @@
+const express = require('express');
+const mongoose = require('mongoose')
 const app = require("./app");
 const connectDatabase = require("./db/Database");
 
@@ -13,18 +15,22 @@ process.on("uncaughtException",(err) =>{
 
 if(process.env.NODE_ENV !== "PRODUCTION"){
     require("dotenv").config({
-        path: "backend/config/.env",
+        path:"./config/.env",
     })
 }
+
+console.log("DB_URL:", process.env.DB_URL);
+console.log("PORT:", process.env.PORT);
+
 
 // connect db
 connectDatabase();
 
 
 // create server
-const PORT = process.env.PORT || 8000;
+// const PORT = process.env.PORT || 8000;
 const server = app.listen(process.env.PORT,()=>{
- console.log(`Server is running on ${PORT}`);
+ console.log(`Server is running on ${process.env.PORT}`);
  
 })
 
