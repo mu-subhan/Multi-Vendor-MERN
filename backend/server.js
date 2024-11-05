@@ -19,8 +19,8 @@ if(process.env.NODE_ENV !== "PRODUCTION"){
     })
 }
 
-console.log("DB_URL:", process.env.DB_URL);
-console.log("PORT:", process.env.PORT);
+// console.log("DB_URL:", process.env.DB_URL);
+// console.log("PORT:", process.env.PORT);
 
 
 // connect db
