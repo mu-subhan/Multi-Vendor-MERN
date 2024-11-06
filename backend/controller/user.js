@@ -5,6 +5,9 @@ const ErrorHandler = require('../utils/ErrorHandler');
 const router = express.Router();
 const User = require("../model/user");
 const fs = require("fs");
+const jwt = require('jsonwebtoken');
+const sendMail = require('../utils/sendMail');
+
 
 router.post("/create-user", upload.single("file"), async (req, res, next) => {
     const { name, email, password } = req.body;
@@ -38,24 +41,52 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
         name,
         email,
         password,
-        avatar: {
-            url: `http://localhost:8000/${fileUrl}`, // URL of the uploaded file
-            public_id: filename, // You can use the filename as the public_id
-        },
+        avatar:fileUrl,
+        // avatar: {
+        //     url: `http://localhost:8000/${fileUrl}`, // URL of the uploaded file
+        //     public_id: filename, // You can use the filename as the public_id
+        // },
     };
 
     // Add logic to save the user to the database
-    try {
-        const newUser = await User.create(user);
-        res.status(201).json({
-            success: true,
-            newUser,
-        });
+    // try {
+    //     const newUser = await User.create(user);
+    //     res.status(201).json({
+    //         success: true,
+    //         newUser,
+    //     });
+    const activationToken = createActivationToken(user);
 
-    } catch (error) {
-        console.error("Error saving user:", error);
-        next(error); // Pass error to the error handler middleware
-    }
+    const activationUrl = `http://localhost:3000/activation/${activationToken}`;
+    
+  try{
+    await sendMail({
+        email:user.email,
+        subject:"Activate your account",
+        message:`Hello ${user.name}, Please click on the link activate your account: ${activationUrl}`,
+    })
+  } catch (error) {
+    return next(new ErrorHandler(error.message,500))
+  }
 });
 
+ catch (error){
+    return next(new ErrorHandler(error.message,400))
+    
+}
+
+// create activation taoken 
+const createActivationToken = (user) =>{
+    return jwt.sign(user,process.env.ACTIVATION_SECRET,{
+        expiresIn:"5m",
+    })
+}
+
+//  ACTIVATE USER 
+
+
 module.exports = router;
+
+
+
+
