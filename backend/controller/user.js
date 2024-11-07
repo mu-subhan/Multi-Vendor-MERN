@@ -41,7 +41,11 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
             name,
             email,
             password,
-            avatar: `http://localhost:8000/uploads/${filename}`, // URL of the uploaded file
+            avatar: {
+                public_id: filename, // or use a unique ID generator if needed
+                url: `http://localhost:8000/uploads/${filename}`, // URL of the uploaded file
+            },
+             // URL of the uploaded file
         };
 
         // Save the user to the database
@@ -64,7 +68,7 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
             // Respond to the client with success
             res.status(201).json({
                 success: true,
-                message: 'User created successfully. Please check your email to activate your account.',
+                message: `User created successfully. Please check your email ${user.email} to activate your account.`,
             });
         } catch (error) {
             return next(new ErrorHandler(error.message, 500));
