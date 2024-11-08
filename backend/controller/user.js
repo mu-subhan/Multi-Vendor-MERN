@@ -7,6 +7,10 @@ const User = require("../model/user");
 const fs = require("fs");
 const jwt = require('jsonwebtoken');
 const sendMail = require('../utils/sendMail');
+const catchAsyncError = require('../middleware/catchAsyncError')
+const sendToken = require("../utils/jwtToken")
+
+
 
 router.post("/create-user", upload.single("file"), async (req, res, next) => {
     try {
@@ -16,21 +20,21 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
         const userEmail = await User.findOne({ email });
 
         if (userEmail) {
-            // If user already exists, delete the uploaded file and respond with an error
-            const filename = req.file.filename;
-            const filePath = path.join(__dirname, '../uploads', filename); // Ensure correct path
+    const filename = req.file.filename;
+    const filePath = path.join(__dirname, '../../uploads', filename); // Ensure the correct path
+    console.log('Attempting to delete file:', filePath); // Debug log
 
-            fs.unlink(filePath, (err) => {
-                if (err) {
-                    console.error("Error deleting file:", err);
-                    return res.status(500).json({ message: "Error deleting file" });
-                } else {
-                    return res.status(400).json({ message: "User already exists, file deleted" });
-                }
-            });
-
-            return; // Stop further execution if the user already exists
+    fs.unlink(filePath, (err) => {
+        if (err) {
+            console.error("Error deleting file:", err);
+            return res.status(500).json({ message: "Error deleting file" });
+        } else {
+            return res.status(400).json({ message: "User already exists, file deleted" });
         }
+    });
+
+    return; // Stop further execution if the user already exists
+}
 
         // Construct URL for locally stored image
         const filename = req.file.filename;
@@ -86,5 +90,29 @@ const createActivationToken = (user) => {
         expiresIn: "5m", // The token expires in 5 minutes
     });
 };
+
+// Activate user
+router.post("/activation",catchAsyncError(async(req,res,next) =>{
+    try {
+        const {activation_Token} = rwq.body;
+
+        const newUser = jwt.verify(activation_Token,process.env.ACTIVATION_SECRET);
+
+        if(!newUser){
+            return next(new ErrorHandler("Invalid token",400));
+        }
+            
+        const {name,email,password,avatar} = newUser;
+           User.create({
+            name,email,avatar,
+            password,
+           });
+
+           sendToken(newUser, 201,res);        
+        
+    } catch (error) {
+        
+    }
+}))
 
 module.exports = router;
