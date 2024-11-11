@@ -5,6 +5,7 @@ import styles from '../../styles/styles';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { server } from '../../server';
+import { toast } from 'react-toastify';
 
 
 const Signup = () => {
@@ -34,13 +35,10 @@ const Signup = () => {
 
         axios.post(`${server}/user/create-user`, newForm, config)
             .then((res) => {
-                // console.log(res);
-                if(res.data.success === true){
-                    navigate("/")
-                }
+               alert(res.message);       
             })
-            .catch((err) => {
-                console.log(err);
+            .catch((error) => {
+                toast.error("oops! some errors")
             });
     };
 
