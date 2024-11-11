@@ -21,7 +21,10 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
 
         if (userEmail) {
     const filename = req.file.filename;
-    const filePath = path.join(__dirname, '../../uploads', filename); // Ensure the correct path
+    // const filePath = path.join(__dirname, '../../uploads', 
+    const filePath = `uploads/${filename}`;
+    
+    // filename); // Ensure the correct path
     console.log('Attempting to delete file:', filePath); // Debug log
 
     fs.unlink(filePath, (err) => {
@@ -31,20 +34,21 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
          } 
     });
 
-    return ; 
+    return next(new ErrorHandler("User already exists",400)); 
 }
 
-        // Construct URL for locally stored image
+        
         const filename = req.file.filename;
         // const fileUrl = path.join('uploads', filename); 
-        const fileUrl = path.join('filename')
+        const fileUrl = path.join(filename)
 
         // Create a new user object
         const user = {
             name,
             email,
             password,
-            avatar:  fileUrl      //{
+            avatar:  fileUrl    
+              //{
                // public_id: filename, // or use a unique ID generator if needed
               //  url: `http://localhost:8000/uploads/${filename}`, // URL of the uploaded file
             };
@@ -85,9 +89,8 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
 
 // Create activation token
 const createActivationToken = (user) => {
-    // return jwt.sign({ id: user._id }, process.env.ACTIVATION_SECRET, ....
-    return jwt.sign(user,process.env.ACTIVATION_SECRET,{
-        expiresIn: "5m", // The token expires in 5 minutes
+        return jwt.sign(user,process.env.ACTIVATION_SECRET,{
+        expiresIn: "5m", 
     })
 };
 
