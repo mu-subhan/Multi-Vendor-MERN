@@ -28,35 +28,34 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
         if (err) {
             console.error("Error deleting file:", err);
             return res.status(500).json({ message: "Error deleting file" });
-        } else {
-            return res.status(400).json({ message: "User already exists, file deleted" });
-        }
+         } 
     });
 
-    return; // Stop further execution if the user already exists
+    return ; 
 }
 
         // Construct URL for locally stored image
         const filename = req.file.filename;
-        const fileUrl = path.join('uploads', filename); // Assuming the file is stored in the 'uploads' folder
+        // const fileUrl = path.join('uploads', filename); 
+        const fileUrl = path.join('filename')
 
         // Create a new user object
         const user = {
             name,
             email,
             password,
-            avatar: {
-                public_id: filename, // or use a unique ID generator if needed
-                url: `http://localhost:8000/uploads/${filename}`, // URL of the uploaded file
-            },
+            avatar:  fileUrl      //{
+               // public_id: filename, // or use a unique ID generator if needed
+              //  url: `http://localhost:8000/uploads/${filename}`, // URL of the uploaded file
+            };
              // URL of the uploaded file
-        };
+        // };
 
         // Save the user to the database
-        const newUser = await User.create(user);
+        // const newUser = await User.create(user);
 
         // Create activation token
-        const activationToken = createActivationToken(newUser);
+        const activationToken = createActivationToken(user);
 
         // Construct the activation URL
         const activationUrl = `http://localhost:3000/activation/${activationToken}`;
@@ -64,9 +63,9 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
         // Send activation email
         try {
             await sendMail({
-                email: newUser.email,
+                email: user.email,
                 subject: "Activate your account",
-                message: `Hello ${newUser.name}, Please click on the link to activate your account: ${activationUrl}`,
+                message: `Hello ${user.name}, Please click on the link to activate your account: ${activationUrl}`,
             });
 
             // Respond to the client with success
@@ -86,32 +85,41 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
 
 // Create activation token
 const createActivationToken = (user) => {
-    return jwt.sign({ id: user._id }, process.env.ACTIVATION_SECRET, {
+    // return jwt.sign({ id: user._id }, process.env.ACTIVATION_SECRET, ....
+    return jwt.sign(user,process.env.ACTIVATION_SECRET,{
         expiresIn: "5m", // The token expires in 5 minutes
-    });
+    })
 };
 
 // Activate user
 router.post("/activation",catchAsyncError(async(req,res,next) =>{
     try {
-        const {activation_Token} = rwq.body;
+        const {activation_token} = req.body;
 
-        const newUser = jwt.verify(activation_Token,process.env.ACTIVATION_SECRET);
+        const newUser = jwt.verify(activation_token,process.env.ACTIVATION_SECRET);
 
         if(!newUser){
             return next(new ErrorHandler("Invalid token",400));
         }
             
         const {name,email,password,avatar} = newUser;
-           User.create({
-            name,email,avatar,
+
+        let user = await User.findOne({email});
+
+        if(user){
+            return next(new ErrorHandler("User already exists",400))
+        }
+         user = await User.create({
+            name,
+            email,
+            avatar,
             password,
            });
 
-           sendToken(newUser, 201,res);        
+           sendToken(user, 201,res);        
         
     } catch (error) {
-        
+        return next(new ErrorHandler(error.message,500));
     }
 }))
 
