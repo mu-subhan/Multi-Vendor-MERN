@@ -21,7 +21,7 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
 
         if (userEmail) {
     const filename = req.file.filename;
-    // const filePath = path.join(__dirname, '../../uploads', 
+    // const filePath = path.join(__dirname, '../../uploads',filename)
     const filePath = `uploads/${filename}`;
     
     // filename); // Ensure the correct path
@@ -52,11 +52,9 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
                // public_id: filename, // or use a unique ID generator if needed
               //  url: `http://localhost:8000/uploads/${filename}`, // URL of the uploaded file
             };
-             // URL of the uploaded file
-        // };
+            
 
-        // Save the user to the database
-        // const newUser = await User.create(user);
+       
 
         // Create activation token
         const activationToken = createActivationToken(user);
@@ -121,6 +119,33 @@ router.post("/activation",catchAsyncError(async(req,res,next) =>{
 
            sendToken(user, 201,res);        
         
+    } catch (error) {
+        return next(new ErrorHandler(error.message,500));
+    }
+}))
+
+
+// login user
+
+router.post("/login-user",catchAsyncError(async (req,res,next) =>{
+    try {
+        const {email,password} = req.body;
+
+        if(!email || !password){
+            return next(new ErrorHandler("Please provide all fields",400));
+        }
+        const user = await User.findOne({email}).select("+password");
+
+        if(!user){
+            return next(new ErrorHandler("User doest not exits!",400));
+        }
+        const isPasswordValid = await user.comparePassword(password);
+
+        if(!isPasswordValid){
+            return next(new ErrorHandler("Please provide correct information",400));
+        }
+        sendToken(user,201,res);
+    
     } catch (error) {
         return next(new ErrorHandler(error.message,500));
     }
