@@ -9,16 +9,14 @@ import { server } from "./server.js";
 
 function App(){
   useEffect(() => {
-    axios.get(`${server}/user/getuser`)
-    .then((res) => {
-      console.log(res.data);
-      
+    axios.get(`${server}/user/getuser`,{withCredentials:true}).then((res) =>{
+      toast.success(res.data.message);
     })
     .catch((err)=>{
       toast.error(err.response.data.message);
     });
-  },[])
-  
+  },[]);
+
   return(
 <BrowserRouter>
 <Routes>
