@@ -35,10 +35,15 @@ const Signup = () => {
 
         axios.post(`${server}/user/create-user`, newForm, config)
             .then((res) => {
-               alert(res.message);       
+            toast.success(res.data.message);
+            setName("");
+            setEmail("");
+            setPassword("");
+            setAvatar();                
             })
             .catch((error) => {
-                toast.error("oops! some errors")
+               
+                toast.error(error.response.data.message)
             });
     };
 
