@@ -8,7 +8,8 @@ const fs = require("fs");
 const jwt = require('jsonwebtoken');
 const sendMail = require('../utils/sendMail');
 const catchAsyncError = require('../middleware/catchAsyncError')
-const sendToken = require("../utils/jwtToken")
+const sendToken = require("../utils/jwtToken");
+const { isAuthentication } = require('../middleware/auth');
 
 
 
@@ -148,6 +149,24 @@ router.post("/login-user",catchAsyncError(async (req,res,next) =>{
     
     } catch (error) {
         return next(new ErrorHandler(error.message,500));
+    }
+}))
+
+// load user
+
+router.get("/getuser",isAuthentication,catchAsyncError(async(req,res,next) =>{
+    try {
+        const user = await User.findById(req.user.id);
+
+        if(!user){
+            return next(new ErrorHandler("User doen't exists",400));
+        }
+        res.status(200).json({
+            success:true,
+            user,
+        })
+    } catch (error) {
+     return next(new ErrorHandler(error.message,500))        
     }
 }))
 
