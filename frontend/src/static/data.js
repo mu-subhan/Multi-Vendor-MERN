@@ -495,7 +495,7 @@ export const navItems = [
         },
         {
           public_id: "test",
-          url: "https://eratablet.com/wp-content/uploads/2022/08/H51ba6537405f4948972e293927673546u.jpg",
+          url: "",
         },
       ],
       shop: {
