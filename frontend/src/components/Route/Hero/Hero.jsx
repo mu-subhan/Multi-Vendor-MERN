@@ -6,9 +6,15 @@ const Hero = () => {
   return (
     <div className={`relative min-h-[70vh] 800px:min-h-[80vh] w-full bg-no-repeat ${styles.normalFlex}`}
     style={{
-        
-        backgroundImage: "url(https://plus.unsplash.com/premium_photo-1711051505860-346a8b58d882?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fGRhaXJ5JTIwYW5kJTIwcGVufGVufDB8fDB8fHww)",
-    }}>
+        backgroundImage: "url(https://plus.unsplash.com/premium_photo-1672883551967-ab11316526b4?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8c2hvcHBpbmd8ZW58MHx8MHx8fDA%3D)",
+        backgroundSize: "cover", 
+        backgroundPosition: "center", 
+        backgroundRepeat: "no-repeat", 
+        height: "100%", 
+        width: "100%", 
+      }}
+      
+      >
         <div className={`${styles.section} w-[90%] 800px:w-[60%]`}>
             <h1 className={`text-[35px] leading-[1.2] 800px:text-[60px] text-[#3d3a3a] font-[600] capitalize`}>
                 Best Collection for <br /> Home Decoration
