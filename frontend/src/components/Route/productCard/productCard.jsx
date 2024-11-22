@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import styles from "../../../styles/styles"
 import { AiFillHeart, AiFillStar, AiOutlineEye, AiOutlineHeart, AiOutlineShoppingCart, AiOutlineStar } from 'react-icons/ai';
-
+import ProductDetailCard from "../ProductDetailCard/ProductDetailCard"
 
 const productCard = ({data}) => {
     const [click,setClick] = useState(false);
@@ -81,6 +81,14 @@ const productCard = ({data}) => {
     onClick={() => setOpen(!open)}
     color="#444"
     title='Add to cart'/>
+
+ {
+  open ? (
+    <ProductDetailCard  setOpen={setOpen} data={data}/>
+  ): null
+ }
+
+
   </div>
    
     </div>
