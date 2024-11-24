@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import styles from "../../styles/styles";
 import { Link } from "react-router-dom";
-import logo from "../../assests/logo.png";
 import { AiOutlineHeart, AiOutlineSearch, AiOutlineShoppingCart } from "react-icons/ai";
 import { categoriesData, productData } from "../../static/data";
 import { IoIosArrowDown, IoIosArrowForward } from "react-icons/io";
@@ -40,7 +39,7 @@ const Header = ({ activeHeading }) => {
         <div className="hidden 800px:h-[50px] 800px:my-[20px] 800px:flex items-center justify-between">
           <div>
             <Link to="/">
-              <img src={logo} alt="logo img" className="w-[10%]" />
+              <img src='https://shopo.quomodothemes.website/assets/images/logo.svg' alt="logo img" />
             </Link>
           </div>
           {/* search box */}
@@ -100,6 +99,7 @@ const Header = ({ activeHeading }) => {
       >
         <div className={`${styles.section} justify-between`}>
           {/* categories */}
+          
           <div onClick={()=> setDropDown(!dropDown)}>
             <div className="relative h-[60px] mt-[10px] w-[270px] hidden 1000px:block">
               <BiMenuAltLeft size={30} className="absolute top-3 left-2" />
