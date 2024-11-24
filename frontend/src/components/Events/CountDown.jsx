@@ -10,10 +10,10 @@ const CountDown = () => {
 
         },1000);
         return () => clearTimeout(timer);
-    },);
+    });
 
       function calculateTimeLeft () {
-        const difference = +new Date('2024-11-23') - +new Date();
+        const difference = +new Date('2024-11-25') - +new Date();
         let timeLeft = {};
 
         if(difference >0){
@@ -28,15 +28,17 @@ const CountDown = () => {
       }
 
 const timeComponents = Object.keys(timeLeft).map((interval) =>{
-    if(!timeLeft(interval)){
+    if(!timeLeft[interval]){
         return null;
     }
-return (
+
+   return (
     <span className='text-[25px] text-[#475ad2]'>
     {timeLeft[interval]} {interval} {" "}
 </span>
-)
-})
+   );
+
+})  
 
 
   return (
