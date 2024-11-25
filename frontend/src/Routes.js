@@ -15,5 +15,5 @@ export {
     ProductPage,
     BestSellingPage,
     EventPage,
-    FAQPage
+    FAQPage,
 };
