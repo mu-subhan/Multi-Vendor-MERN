@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useState,useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-
+import {server} from "../server"
 
 const ActivationPage = () => {
     const {activation_token} = useParams();
@@ -16,6 +16,7 @@ const ActivationPage = () => {
                     });
                     console.log(res.data.message);
                 } catch(error){
+                    // console.log("error is: ",error)
                     console.log(error.response.data.message);
                     setError(true)             
                 };
