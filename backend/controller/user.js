@@ -48,7 +48,7 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
             name,
             email,
             password,
-            avatar:  
+            avatar: 
               {
                public_id: filename, // or use a unique ID generator if needed
                url: `http://localhost:8000/uploads/${filename}`, // URL of the uploaded file
