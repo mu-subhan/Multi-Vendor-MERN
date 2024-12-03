@@ -6,6 +6,7 @@ import ProductPage from "../src/pages/ProductPage"
 import BestSellingPage from "../src/pages/BestSellingPage";
 import EventPage from "../src/pages/EventPage";
 import FAQPage from "../src/pages/FAQPage";
+import CheckoutPage from "../src/pages/CheckoutPage";
 
 export {
     LoginPage,
@@ -16,4 +17,5 @@ export {
     BestSellingPage,
     EventPage,
     FAQPage,
+    CheckoutPage,
 };
