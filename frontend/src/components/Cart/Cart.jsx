@@ -66,7 +66,7 @@ const Cart = ({setOpenCart}) => {
         {/* check button  */}
         <Link to={"/checkout"}>
         <div className={`h-[45px] flex items-center justify-center w-[100%] bg-[#e44343] rounded-[5px]`}>
-
+   <h1 className='text-white font-Roboto text-[18px] font-[600]'>CheckOut Now (USD$1080)</h1>
         </div>
         </Link>
       </div>
@@ -111,9 +111,7 @@ const CartSingle = ({ data }) => {
           </h4 >
           <h4 className="font-[500] text-[17px] pt-[4px] text-[#d02222] font-Roboto">US$ {totalPrice}</h4>
         </div>
-        <RxCross1 className='cursor-pointer'>
-
-        </RxCross1>
+        <RxCross1 className='cursor-pointer'/>
       </div>
     </div>
   );
