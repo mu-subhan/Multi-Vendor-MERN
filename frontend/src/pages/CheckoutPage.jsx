@@ -1,7 +1,7 @@
 import React from 'react'
 import Header from '../components/Layout/Header'
 import Footer from '../components/Layout/Footer'
-
+import Checkout from "../components/Checkout/Checkout"
 import CheckoutSteps from "../components/CheckoutSteps/CheckoutSteps.jsx"
 
 
@@ -13,7 +13,7 @@ const CheckoutPage = () => {
       <br/>
       <br/>
       <CheckoutSteps active={1}/>
-
+      <Checkout/>
       <br/>
       <br/>
      <Footer/>
