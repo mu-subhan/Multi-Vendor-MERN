@@ -7,7 +7,7 @@ import BestSellingPage from "../src/pages/BestSellingPage";
 import EventPage from "../src/pages/EventPage";
 import FAQPage from "../src/pages/FAQPage";
 import CheckoutPage from "../src/pages/CheckoutPage";
-
+import PaymentPage from "../src/pages/PaymentPage.jsx"
 export {
     LoginPage,
     SignupPage,
@@ -18,4 +18,5 @@ export {
     EventPage,
     FAQPage,
     CheckoutPage,
+    PaymentPage
 };
