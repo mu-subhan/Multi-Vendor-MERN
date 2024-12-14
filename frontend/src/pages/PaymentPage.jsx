@@ -1,42 +1,20 @@
-import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import React from 'react'
+import Header from '../components/Layout/Header'
+import CheckoutSteps from '../components/CheckoutSteps/CheckoutSteps'
+import Footer from '../components/Layout/Footer'
+import Payment from "../components/Payment/Payment"
 
 const PaymentPage = () => {
-  const [orderData,setOrderData] = useState([]);
-  const [open,setOpen] = useState(false);
-  const {user} = useSelector((state)=> state.user);
-  const navigate = useNavigate();
-
-
-  useEffect(()=>{
-    const orderData = JSON.parse(localStorage.getItem("latestOrder"));
-    setOrderData(orderData);
-  },[]);
-
-  const createOrder = (data,action)=>{
-    return action.order.create({
-      purchase_units:[
-        {
-          description:"Sun-flower",
-          amount:{
-            currency_code:"USD",
-            value:orderData?.totalPrice,
-          },
-        },
-      ],
-      // not needed if a shipping address is actually needed
-      application_context:{
-        shipping_preference:"NO_SHIPPING",
-      }
-    })
-    .THEN((orderID)=>{
-      return orderID;
-    });
-  };
-  
   return (
-    <div>
+    <div className='w-full min-h-screen bg-[#f6f9fc]'>
+      <Header/>
+      <br/>
+      <br/>
+      <CheckoutSteps active={2}/>
+      <Payment />
+      <br/>
+      <br/>
+      <Footer/>
       
     </div>
   )
