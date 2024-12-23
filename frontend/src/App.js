@@ -11,6 +11,7 @@ import {
   FAQPage,
   CheckoutPage,
   PaymentPage,
+  OrderSuccessPage
 } from "./Routes.js";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -42,6 +43,7 @@ function App() {
             <Route path="/faq" element={<FAQPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/payment" element={<PaymentPage />} />
+            <Route path="/order/success/:id" element={<OrderSuccessPage/>}/>
           </Routes>
           <ToastContainer
             position="bottom-center"
