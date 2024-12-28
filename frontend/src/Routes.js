@@ -1,4 +1,4 @@
-import LoginPage from '../src/pages/Login';
+ import LoginPage from '../src/pages/Login';
 import SignupPage from '../src/pages/SignupPage';
 import ActivationPage from '../src/pages/ActivationPage';
 import HomePage from "../src/pages/HomePage"
@@ -9,6 +9,7 @@ import FAQPage from "../src/pages/FAQPage";
 import CheckoutPage from "../src/pages/CheckoutPage";
 import PaymentPage from "../src/pages/PaymentPage";
 import OrderSuccessPage from "../src/pages/OrderSuccessPage"
+import ProductDetailsPage from "../src/pages/ProductDetailsPage"
 export {
     LoginPage,
     SignupPage,
@@ -20,5 +21,6 @@ export {
     FAQPage,
     CheckoutPage,
     PaymentPage,
-    OrderSuccessPage
+    OrderSuccessPage,
+    ProductDetailsPage
 };
