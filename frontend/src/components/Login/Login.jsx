@@ -13,25 +13,26 @@ const Login = () => {
   const [visible, setVisible] = useState(false);
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
+    
+    try {
+      const res = await axios.post(
+        `${server}/user/login-user`,
+        { email, password },
+        { withCredentials: true }
+      );
   
-  await axios.post(`${server}/user/login-user`,
-    {
-      email,
-      password,
-    },
-    {
-      withCredentials:true
+      toast.success("Login Success");
+      navigate("/");
+      window.location.reload(true);
+    } catch (err) {
+      // Log the error to check the structure
+      console.error("Error:", err);
+  
+      // Check if error response and message exist, otherwise fallback to default error message
+      const errorMessage = err.response?.data?.message || "An unknown error occurred!";
+      toast.error(errorMessage);
     }
-  ).then((res)=>{
-    toast.success("Login Success")
-    navigate("/");
-    window.location.reload(true)
-  })
-  .catch((err) =>{
-    toast.error(err.response.data.message);
-  });
-
   };
 
   return (

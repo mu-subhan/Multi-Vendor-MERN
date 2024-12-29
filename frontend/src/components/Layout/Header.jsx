@@ -112,7 +112,7 @@ const Header = ({ activeHeading }) => {
           active === true ? "shadow-sm fixed top-0 left-0 z-10" : null
         } transition hidden 800px:flex items-center justify-between w-full bg-[#3321c8] h-[70px]`}
       >
-        <div className={`${styles.section} justify-between`}>
+        <div className={`${styles.section} justify-between px-8`}>
           {/* categories */}
 
           <div onClick={() => setDropDown(!dropDown)}>
