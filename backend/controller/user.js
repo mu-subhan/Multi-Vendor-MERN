@@ -22,8 +22,8 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
 
         if (userEmail) {
     const filename = req.file.filename;
-    // const filePath = path.join(__dirname, '../../uploads',filename)
-    const filePath = `uploads/${filename}`;
+    const filePath = path.join(__dirname, '../../uploads',filename)
+    // const filePath = `uploads/${filename}`;
     
     // filename); // Ensure the correct path
     console.log('Attempting to delete file:', filePath); // Debug log
