@@ -2,7 +2,8 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 
-const uploadDir = path.join(__dirname, '..', './../uploads'); // Moves up to the root directory
+const uploadDir = path.join(__dirname, '..', '/uploads'); // Moves up to the root directory
+console.log('Resolved upload directory:', uploadDir);
 
 // Ensure the 'uploads' directory exists
 if (!fs.existsSync(uploadDir)) {
