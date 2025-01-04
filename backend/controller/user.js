@@ -90,7 +90,7 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
 // Create activation token
 const createActivationToken = (user) => {
         return jwt.sign(user,process.env.ACTIVATION_SECRET,{
-        expiresIn: "5m", 
+        expiresIn: "10m", 
     })
 };
  
@@ -185,7 +185,7 @@ router.get("/logout",isAuthentication,catchAsyncError(async(req,res,next) =>{
     try{
         res.cookie("token",null,{
             expires:new Date(Date.now()),
-            httpOnly:true,
+            // httpOnly:true,
         });
         res.status(201).json({
             success:true,

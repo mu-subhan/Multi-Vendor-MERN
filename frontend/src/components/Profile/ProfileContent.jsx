@@ -4,6 +4,8 @@ import { useSelector } from "react-redux";
 import { AiOutlineArrowRight, AiOutlineCamera } from "react-icons/ai";
 import styles from "../../styles/styles";
 import { Link } from "react-router-dom";
+import AllOrders from "./AllOrders";
+
 
 const ProfileContent = ({ active }) => {
   const { user } = useSelector((state) => state.user);
@@ -26,7 +28,7 @@ const ProfileContent = ({ active }) => {
           <div className="flex justify-center w-full">
             <div className="relative">
               <img
-                src={`${backend_url}${user?.avatar}`}
+                src={user?.avatar.url}
                 alt="user-profile piture"
                 className="w-[150px] h-[150px] rounded-full object-cover border-[3px] border-[#3ad132]"
               />
@@ -151,57 +153,94 @@ const ProfileContent = ({ active }) => {
       {active === 2 && (
         <div>
           <AllOrders />
+          {/* <p>Testing phasae</p> */}
         </div>
       )}
     </div>
   );
 };
 
-const AllOrders =() =>{
-  const orders=[
-    {
-      _id:"7463hvbfbhfbrtr28820221",
-      orderStatus:[
-        {
-          name:"Iphone 14 pro max",
-        },
-      ],
-      totalPrice:120,
-      orderStatus:"Processing",
-    },
-  ];
+// const AllOrders = () => {
+//   const orders = [
+//     {
+//       _id: "7463hvbfbhfbrtr28820221",
+//       orderItems: [{ name: "Iphone 14 pro max" }],
+//       totalPrice: 120,
+//       orderStatus: "Processing",
+//     },
+//   ];
 
-  const columns = [
-    {
-      field:"id",headerName:"order ID", minWidth:150,flex:0.7
-    },
-    {
-      field:"status",
-      headerName:"Status",
-      minWidth:130,
-      flex:0.7,
-      cellClassName:(params) =>{
-        return params.getValue(params.id,"status") === "Delivered" ? "greenColor" : "redColor";
-      },
-    },
-    {
-      field:"ItemsQty",
-      headerName:"Item Qty",
-      type:"number",
-      minWidth:130,
-      flex:0.7,
-    },
-    {
-      
-    }
-  ]
+//   const columns = [
+//     {
+//       field: "id",
+//       headerName: "Order ID",
+//       minWidth: 150,
+//       flex: 0.7,
+//     },
+//     {
+//       field: "status",
+//       headerName: "Status",
+//       minWidth: 130,
+//       flex: 0.7,
+//       cellClassName: (params) => {
+//         return params.getValue(params.id, "status") === "Delivered"
+//           ? "greenColor"
+//           : "redColor";
+//       },
+//     },
+//     {
+//       field: "itemsQty",
+//       headerName: "Item Qty",
+//       type: "number",
+//       minWidth: 130,
+//       flex: 0.7,
+//     },
+//     {
+//       field: "total",
+//       headerName: "Total",
+//       type: "number",
+//       minWidth: 130,
+//       flex: 0.0,
+//     },
+//     {
+//       field: "action",
+//       headerName: "",
+//       minWidth: 150,
+//       sortable: false,
+//       renderCell: (params) => (
+//         <Link to={`/order/${params.id}`}>
+//           <Button>
+//             <AiOutlineArrowRight size={20} />
+//           </Button>
+//         </Link>
+//       ),
+//     },
+//   ];
 
-  return (
-    <div className="pl-8 pt-1">
+//   const row = [];
+//   orders &&
+//     orders.length &&
+//     orders.forEach((item) => {
+//       row.push({
+//         id: item._id,
+//         itemsQty: item.orderItems ? item.orderItems.length : 0,
+//         total: "US$ " + item.totalPrice,
+//         status: item.orderStatus,
+//       });
+//     });
 
-    </div>
-  )
-};
+//   return (
+//     <div style={{ height: 400, width: "100%" }}>
+//       <DataGrid
+//         rows={row}
+//         columns={columns}
+//         pageSize={5}
+//         disableRowSelectionOnClick
+//       />
+//     </div>
+//   );
+// };
+
 
 
 export default ProfileContent;
