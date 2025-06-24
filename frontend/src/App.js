@@ -23,7 +23,7 @@ import { useSelector } from "react-redux";
 import ProtectedRoute from "./ProtectedRoute.js";
 
 function App() {
-  const { loading,} = useSelector((state) => state.user);
+  const { loading,isAuthenticated} = useSelector((state) => state.user);
 
   // isAuthentication
   useEffect(() => {
@@ -50,10 +50,10 @@ function App() {
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/payment" element={<PaymentPage />} />
             <Route path="/order/success/:id" element={<OrderSuccessPage/>}/>
-            <Route path="/profile" element={<ProfilePage/>
-              // <ProtectedRoute isAuthentication={isAuthentication}>
-              //   <ProfilePage/>
-              // </ProtectedRoute>
+            <Route path="/profile" element={
+              <ProtectedRoute isAuthenticated={isAuthenticated}>
+                <ProfilePage/>
+              </ProtectedRoute>
             }/>
           
           </Routes>

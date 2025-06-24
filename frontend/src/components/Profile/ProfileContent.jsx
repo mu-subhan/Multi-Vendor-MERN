@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { backend_url } from "../../server";
 import { useSelector } from "react-redux";
-import { AiOutlineArrowRight, AiOutlineCamera } from "react-icons/ai";
+import { AiOutlineArrowRight, AiOutlineCamera, AiOutlineDelete } from "react-icons/ai";
+import { MdOutlineTrackChanges, MdTrackChanges } from "react-icons/md";
 import styles from "../../styles/styles";
 import { Link } from "react-router-dom";
 // import AllOrders from "./AllOrders";
 import { DataGrid } from '@mui/x-data-grid';
 import { Button } from "@mui/material";
+import visa from "../../assests/visa.png"
 
 
 
@@ -44,8 +46,8 @@ const ProfileContent = ({ active }) => {
           <br />
           <div className="w-full px-5">
             <form onSubmit={handleSubmit} aria-required={true}>
-              <div className="w-full grid grid-cols-2 pb-2">
-                <div className="w-[50%]">
+              <div className="w-full 800px:flex block pb-3">
+                <div className="w-[100%] 800px:w-[50%]">
                   <label
                     className="
                     block pb-2 font-bold"
@@ -54,14 +56,14 @@ const ProfileContent = ({ active }) => {
                   </label>
                   <input
                     type="text"
-                    className={`${styles.input} rounded mb-4 !w-[95%] text-gray-700`}
+                    className={`${styles.input} !w-[95%] mb-4 800px:mb-0`}
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
                 </div>
 
-                <div className="w-[50%]">
+                <div className="w-[100%] 800px:w-[50%]">
                   <label
                     className="
                     block pb-2 font-bold"
@@ -70,46 +72,51 @@ const ProfileContent = ({ active }) => {
                   </label>
                   <input
                     type="email"
-                    className={`${styles.input} mb-4 !w-[95%]`}
+                    className={`${styles.input} !w-[95%] mb-1 800px:mb-0`}
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
-
-                <div className="w-[50%]">
+                </div>
+            
+            <div className="w-full 800px:flex block pb-3">
+                 <div className="w-[100%] 800px:w-[50%]">
                   <label
                     className="
                     block pb-2 font-bold"
-                  >
+                    >
                     Phone Address
                   </label>
                   <input
                     type="number"
-                    className={`${styles.input} mb-4 !w-[95%]`}
+                    className={`${styles.input} !w-[95%] mb-1 800px:mb-0`}
                     required
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
-                  />
+                    />
                 </div>
 
-                <div className="w-[50%]">
+                <div className="w-[100%] 800px:w-[50%]">
                   <label
                     className="
                     block pb-2 font-bold"
-                  >
+                    >
                     Zip Code
                   </label>
                   <input
                     type="number"
-                    className={`${styles.input} mb-4 !w-[95%]`}
+                    className={`${styles.input} !w-[95%] mb-1 800px:mb-0`}
                     required
                     value={zipCode}
                     onChange={(e) => setZipCode(e.target.value)}
-                  />
+                    />
                 </div>
+                 </div>
 
-                <div className="w-[50%]">
+            <div className="w-full 800px:flex block pb-3">
+                 
+                <div className="w-[100%] 800px:w-[50%]">
                   <label
                     className="
                     block pb-2 font-bold"
@@ -118,14 +125,14 @@ const ProfileContent = ({ active }) => {
                   </label>
                   <input
                     type="address"
-                    className={`${styles.input} mb-4 !w-[95%]`}
+                    className={`${styles.input} !w-[95%] mb-1 800px:mb-0`}
                     required
                     value={address1}
                     onChange={(e) => setAddress1(e.target.value)}
                   />
                 </div>
 
-                <div className="w-[50%]">
+                <div className="w-[100%] 800px:w-[50%]">
                   <label
                     className="
                     block pb-2 font-bold"
@@ -134,7 +141,7 @@ const ProfileContent = ({ active }) => {
                   </label>
                   <input
                     type="address"
-                    className={`${styles.input} mb-4 !w-[95%]`}
+                    className={`${styles.input} !w-[95%] mb-1 800px:mb-0`}
                     required
                     value={address2}
                     onChange={(e) => setAddress2(e.target.value)}
@@ -168,6 +175,31 @@ const ProfileContent = ({ active }) => {
         
         </div>
       )}
+{/* Track order page */}
+{
+  active === 5 && (
+    <div>
+      <TrackOrder/>
+      </div>
+  )
+}
+
+{/* payment page */}
+{
+  active === 6 &&(
+    <div>
+      <PaymentMethod/>
+    </div>
+  )
+}
+{/* user address */}
+
+{active === 7 && (
+  <div>
+    <Address/>
+  </div>
+)}
+
     </div>
   );
 };
@@ -335,7 +367,156 @@ const AllRefundOrders = () => {
   );
 };
 
+const TrackOrder =()=>{
+  const orders = [
+    {
+      _id: "7463hvbfbhfbrtr28820221",
+      orderItems: [{ name: "Iphone 14 pro max" }],
+      totalPrice: 120,
+      orderStatus: "Processing",
+    },
+    {
+      _id: "6348hvbfbhfbrtr12345021",
+      orderItems: [{ name: "Samsung Galaxy" }],
+      totalPrice: 150,
+      orderStatus: "Delivered",
+    },
+  ];
+  const columns = [
+    { field:"id",headerName:"Order ID",minWidth:150,flex:0.7},
+    {
+      field: "status",
+      headerName: "Status",
+      minWidth: 130,
+      flex: 0.7,
+      cellClassName: (params) => {
+        // Correct way to access the status value in the row
+        return params.row.status === "Delivered" ? "greenColor" : "redColor";
+      },
+    },
+    {
+      field: "itemsQty",
+      headerName: "Item Qty",
+      type: "number",
+      minWidth: 130,
+      flex: 0.7,
+    },
+    {
+      field: "total",
+      headerName: "Total",
+      type: "number",
+      minWidth: 130,
+      flex: 0.7, // Adjust this so the column is visible
+    },
+     {
+      field: " ",
+      flex: 1,
+      minWidth: 150,
+      headerName: "",
+      type: "number",
+      sortable: false,
+      renderCell: (params) => {
+        return (
+          <>
+            <Link to={`/order/${params.id}`}>
+              <Button>
+                <MdOutlineTrackChanges size={20} />
+              </Button>
+            </Link>
+          </>
+        );
+      },
+    },
+  ]
+
+  const row =[];
+
+   orders &&
+    orders.forEach((item) => {
+      row.push({
+        id: item._id,
+        itemsQty: item.orderItems.length,
+        total: "US$ " + item.totalPrice,
+        status: item.status,
+      });
+    });
+
+  return (
+    <div className="pl-8 pt-1">
+ <DataGrid
+        rows={row}
+        columns={columns}
+        pageSize={10}
+        disableSelectionOnClick
+        autoHeight
+      />
+    </div>
+  )
+}
+
+const PaymentMethod =()=>{
+  return(
+    <div className="w-full px-5">
+      <div className="flex w-full items-center justify-between">
+        <h1 className="text-[25px] font-[600] text-[#000000ba] pb-2">
+    Payment Method
+        </h1>
+        <div className={`${styles.button} rounded-md`}>
+<span className="text-[#fff]">Add New</span>
+        </div>
+      </div>
+      <br />
+      <div className="w-full bg-white h-[70px] rounded-[4px] flex items-center px-3 shadow justify-between pr-10">
+        <div className="flex items-center">
+          <img src={visa}
+          className="w-12 h-12" />
+          <h5 className="pl-5 font-[600]">Subhan Shabeer</h5>
+        </div>
+        <div className="pl-8 flex items-center">
+          <h6 className="">1237 **** *** ****</h6>
+           <h5 className="pl-6">08/2025</h5>
+        </div>
+        <div className="min-w-[10%] flex items-center justify-between pl-8">
+<AiOutlineDelete size={25} className="cursor-pointer"/>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const Address =()=>{
+return(
+  <div className="w-full px-5">
+      <div className="flex w-full items-center justify-between">
+        <h1 className="text-[25px] font-[600] text-[#000000ba] pb-2">
+    My Address
+        </h1>
+        <div className={`${styles.button} rounded-md`}>
+<span className="text-[#fff]">Add New</span>
+        </div>
+      </div>
+      <br />
+      <div className="w-full bg-white h-[70px] rounded-[4px] flex items-center px-3 shadow justify-between pr-10">
+        <div className="flex items-center">
+        
+          <h5 className="pl-5 font-[600]">Default</h5>
+        </div>
+        <div className="pl-8 flex items-center">
+          
+           <h5 className="">65 Canal Bank Madni Park Lahore</h5>
+        </div>
+             <div className="pl-8 flex items-center">
+          
+           <h5 className="">{+92} 326 ****** </h5>
+        </div>
 
 
+        <div className="min-w-[10%] flex items-center justify-between pl-8">
+<AiOutlineDelete size={25} className="cursor-pointer"/>
+        </div>
+      </div>
+    </div>
+)
+}
 
 export default ProfileContent;

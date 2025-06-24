@@ -7,22 +7,26 @@ import {MdOutlineTrackChanges} from "react-icons/md";
 import {TbAddressBook} from "react-icons/tb";
 import { server } from '../../server'
 import { toast } from 'react-toastify'
+import axios from "axios"
 
 const ProfileSidebar = ({setActive,active}) => {
 
 const navigate = useNavigate();
 
-// const logoutHandler =()=>{
-//    axios.get(`${server}/user/logout`,{withCredential:true})
-//    .then((res)=>{
-//       toast.success(res.data.message);
-//       // window.location.reload(true);
-//       navigate("/login");
-//    })
-//    .catch((error)=>{
-//       console.log(error.response.data.message)
-//    })
-// }
+const logoutHandler = () => {
+  axios.get(`${server}/user/logout`, { withCredentials: true })
+    .then((res) => {
+      toast.success(res.data.message);
+      window.location.reload(true);
+      navigate("/login");
+    })
+    .catch((error) => {
+      console.log(error.response?.data?.message || "Logout failed");
+      toast.error("Session expired. Redirecting to login.");
+      navigate("/login"); // redirect even on failure
+    });
+};
+
 
   return (
     <div className='w-full bg-white shadow-sm rounded-[10px] p-4 pt-8'>
@@ -61,7 +65,7 @@ const navigate = useNavigate();
       <div className='flex items-center cursor-pointer w-full mb-8'
       onClick={()=>setActive(5)}>
          <MdOutlineTrackChanges size={30} color={active ===5 ? "red" : ""}/>
-         <span className={`pl-3 ${active === 5 ? "text-[red]" : ""}`}>
+         <span className={`pl-3 ${active === 5 ? "text-[red]" : ""}800px:block hidden`}>
             Track Order
          </span>
       </div>
@@ -69,7 +73,7 @@ const navigate = useNavigate();
       <div className='flex items-center cursor-pointer w-full mb-8'
       onClick={()=>setActive(6)}>
          <AiOutlineCreditCard size={30} color={active === 6 ? "red" : ""}/>
-         <span className={`pl-3 ${active === 6 ? "text-[red]" : ""}`}>
+         <span className={`pl-3 ${active === 6 ? "text-[red]" : ""} 800px:block hidden`}>
             Payment Method
          </span>
       </div>
@@ -83,11 +87,11 @@ const navigate = useNavigate();
          </span>
       </div>
 
-      <div className='flex items-center cursor-pointer w-full mb-8'
-      onClick={()=>setActive(8) }>
-         {/* || logoutHandler() */}
-         <AiOutlineLogin size={30} color={active ===8 ? "red" : ""}/>
-         <span className={`pl-3 ${active === 8 ? "text-[red]" : ""} 800px:block hidden`}>
+      <div className='single_item flex items-center cursor-pointer w-full mb-8'
+      onClick={()=>setActive(8) || logoutHandler()}>
+         
+         <AiOutlineLogin size={30} color={active === 8 ? "red" : ""}/>
+         <span className={`pl-3 ${active === 8 ? "text-[red]" : ""}800px:block hidden`}>
             Log out
          </span>
       </div>

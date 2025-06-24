@@ -14,7 +14,7 @@ const ProfilePage = () => {
     <div>
     <Header />
     <div className={`${styles.section} flex bg-[#f5f5f5] py-10`}>
-      <div className='w-[25%] '>
+      <div className='w-[50px] 800px:w-[335px]'>
       <ProfileSidebar active={active} setActive = {handeActiveChange}/>
       </div>
       <ProfileContent active={active}/>
