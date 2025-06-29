@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import {
   LoginPage,
   SignupPage,
@@ -15,26 +15,33 @@ import {
   ProductDetailsPage,
   ProfilePage,
   ShopCreatePage,
-  SellerActivationPage
+  SellerActivationPage,
+  ShopLoginPage
 } from "./Routes.js";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Store from "./redux/store.js";
-import { loadUser } from "./redux/actions/user.js";
+import { loadSeller, loadUser } from "./redux/actions/user.js";
 import { useSelector } from "react-redux";
-import ProtectedRoute from "./ProtectedRoute.js";
+import ProtectedRoute from "./ProtectedRoute";
+import SellerProtectedRoute from "./SellerProtectedRoute.js"
+import {ShopHomePage} from "./ShopRoutes"
 
 function App() {
   const { loading,isAuthenticated} = useSelector((state) => state.user);
+  const {isLoading, isSeller} = useSelector((state) => state.seller);
+  
 
   // isAuthentication
   useEffect(() => {
     Store.dispatch(loadUser());
+    Store.dispatch(loadSeller());
   }, []);
 
+  // console.log(isSeller,seller)
   return (
     <>
-      {loading ? null : (
+      {loading  || isLoading ? null : (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -65,7 +72,21 @@ function App() {
                 <ProfilePage/>
               </ProtectedRoute>
             }/>
+            {/* Shop Routes */}
             <Route path="/shop-create" element={<ShopCreatePage />} />
+            <Route path="/shop-login" element={<ShopLoginPage />} />
+            {/* <Route path="/shop/:id" element={<ShopHomePage/>}/> */}
+           <Route
+          path="/shop/:id"
+          element={
+            <SellerProtectedRoute
+              isSeller={isSeller}>
+              <ShopHomePage />
+            </SellerProtectedRoute>
+          }
+        />
+
+
 
           
           </Routes>

@@ -14,22 +14,34 @@ const ShopCreate = () => {
   const [address, setAddress] = useState("");
   const [zipCode, setZipCode] = useState();
   const [avatar, setAvatar] = useState();
+  const [avatarPreview, setAvatarPreview] = useState();
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
 
+  const formData = new FormData();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    const config = { headers: { "Content-Type": "multipart/form-data" } };
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("password", password);
+    formData.append("zipCode", zipCode);
+    formData.append("address", address);
+    formData.append("phoneNumber", phoneNumber);
+    formData.append("avatar", avatar);
     axios
-      .post(`${server}/shop/create-shop`, {
-        name,
-        email,
-        password,
-        avatar,
-        zipCode,
-        address,
-        phoneNumber,
-      })
+      .post(`${server}/shop/create-shop`,formData, config
+        // {
+        // name,
+        // email,
+        // password,
+        // avatar,
+        // zipCode,
+        // address,
+        // phoneNumber,
+    //  }
+    )
       .then((res) => {
         toast.success(res.data.message);
         setName("");
@@ -48,15 +60,20 @@ const ShopCreate = () => {
   };
 
   const handleFileInputChange = (e) => {
-    const reader = new FileReader();
+    const file = e.target.files[0];
+    if (file) {
+      setAvatar(file);
 
-    reader.onload = () => {
-      if (reader.readyState === 2) {
-        setAvatar(reader.result);
-      }
-    };
+      const reader = new FileReader();
 
-    reader.readAsDataURL(e.target.files[0]);
+      reader.onload = () => {
+        if (reader.readyState === 2) {
+          setAvatarPreview(reader.result);
+        }
+      };
+
+      reader.readAsDataURL(e.target.files[0]);
+    }
   };
 
   return (
@@ -205,9 +222,9 @@ const ShopCreate = () => {
               ></label>
               <div className="mt-2 flex items-center">
                 <span className="inline-block h-8 w-8 rounded-full overflow-hidden">
-                  {avatar ? (
+                  {avatarPreview ? (
                     <img
-                      src={avatar}
+                      src={avatarPreview}
                       alt="avatar"
                       className="h-full w-full object-cover rounded-full"
                     />
