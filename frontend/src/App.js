@@ -21,16 +21,13 @@ import {
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Store from "./redux/store.js";
-import { loadSeller, loadUser } from "./redux/actions/user.js";
-import { useSelector } from "react-redux";
-import ProtectedRoute from "./ProtectedRoute";
-import SellerProtectedRoute from "./SellerProtectedRoute.js"
+import { loadSeller, loadUser } from "./redux/actions/user";
+import ProtectedRoute from "./routes/ProtectedRoute";
+import SellerProtectedRoute from "./routes/SellerProtectedRoute";
 import {ShopHomePage} from "./ShopRoutes"
 
 function App() {
-  const { loading,isAuthenticated} = useSelector((state) => state.user);
-  const {isLoading, isSeller} = useSelector((state) => state.seller);
-  
+   
 
   // isAuthentication
   useEffect(() => {
@@ -40,8 +37,7 @@ function App() {
 
   // console.log(isSeller,seller)
   return (
-    <>
-      {loading  || isLoading ? null : (
+   
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -61,14 +57,14 @@ function App() {
             <Route path="/events" element={<EventPage />} />
             <Route path="/faq" element={<FAQPage />} />
             <Route path="/checkout" element={
-              <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ProtectedRoute>
                 <CheckoutPage />
               </ProtectedRoute>
               } />
             <Route path="/payment" element={<PaymentPage />} />
             <Route path="/order/success/:id" element={<OrderSuccessPage/>}/>
             <Route path="/profile" element={
-              <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ProtectedRoute >
                 <ProfilePage/>
               </ProtectedRoute>
             }/>
@@ -79,8 +75,7 @@ function App() {
            <Route
           path="/shop/:id"
           element={
-            <SellerProtectedRoute
-              isSeller={isSeller}>
+            <SellerProtectedRoute>
               <ShopHomePage />
             </SellerProtectedRoute>
           }
@@ -103,8 +98,7 @@ function App() {
             theme="dark"
           />
         </BrowserRouter>
-      )}
-    </>
+     
   );
 }
 export default App;
