@@ -25,18 +25,15 @@ import { loadSeller, loadUser } from "./redux/actions/user";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import SellerProtectedRoute from "./routes/SellerProtectedRoute";
 import {ShopHomePage} from "./ShopRoutes"
-import {ShopDashboardPage} from "./routes/ShopRoutes"
+import {ShopDashboardPage,ShopCreateProduct} from "./routes/ShopRoutes"
 
 function App() {
    
-
-  // isAuthentication
   useEffect(() => {
     Store.dispatch(loadUser());
     Store.dispatch(loadSeller());
   }, []);
 
-  // console.log(isSeller,seller)
   return (
    
         <BrowserRouter>
@@ -87,6 +84,15 @@ function App() {
           element={
             <SellerProtectedRoute>
               <ShopDashboardPage/>
+            </SellerProtectedRoute>
+          }
+        />
+
+          <Route
+          path="/dashboard-create-product"
+          element={
+            <SellerProtectedRoute>
+              <ShopCreateProduct/>
             </SellerProtectedRoute>
           }
         />
