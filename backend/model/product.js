@@ -37,7 +37,7 @@ const productSchema = new mongoose.Schema({
       //   type: String,
       //   required: true,
       // },
-      type:String,
+      type: String,
     },
   ],
 
@@ -65,10 +65,10 @@ const productSchema = new mongoose.Schema({
   //   type: Number,
   // },
 
-  // shopId: {
-  //   type: String,
-  //   required: true,
-  // },
+  shopId: {
+    type: String,
+    required: true,
+  },
   
   shop: {
     type: Object,
