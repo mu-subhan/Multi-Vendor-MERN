@@ -17,26 +17,39 @@ const ShopLogin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    dispatch({ type: "LoadUserRequest" });
+    if (!email || !password) {
+      return toast.error("Please fill in all fields");
+    }
+
+    dispatch({ type: "LoadSellerRequest" });
 
     try {
       const res = await axios.post(
         `${server}/shop/login-shop`,
-        { email, password },
-        { withCredentials: true }
+        { 
+          email, 
+          password 
+        },
+        { 
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          }
+        }
       );
 
-      dispatch({ type: "LoadUserSuccess", payload: res.data.user });
-
-      toast.success("Login Success");
-      navigate("/");
-      // window.location.reload(true);
+      if (res.data.success) {
+        dispatch({ type: "LoadSellerSuccess", payload: res.data.seller });
+        toast.success("Login Success!");
+        navigate("/dashboard");
+      } else {
+        dispatch({ type: "LoadSellerFail", payload: res.data.message });
+        toast.error(res.data.message);
+      }
     } catch (err) {
-      console.error("Error:", err);
-
-      const errorMessage = err.response?.data?.message || "An unknown error occurred!";
-      dispatch({ type: "LoadUserFail", payload: errorMessage });
-
+      console.error("Login Error:", err);
+      const errorMessage = err.response?.data?.message || "An unknown error occurred during login!";
+      dispatch({ type: "LoadSellerFail", payload: errorMessage });
       toast.error(errorMessage);
     }
   };

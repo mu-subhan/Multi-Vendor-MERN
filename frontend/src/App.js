@@ -25,7 +25,7 @@ import { loadSeller, loadUser } from "./redux/actions/user";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import SellerProtectedRoute from "./routes/SellerProtectedRoute";
 import {ShopHomePage} from "./ShopRoutes"
-import {ShopDashboardPage,ShopCreateProduct} from "./routes/ShopRoutes"
+import {ShopDashboardPage,ShopCreateProduct,ShopAllProducts} from "./routes/ShopRoutes"
 
 function App() {
    
@@ -93,6 +93,15 @@ function App() {
           element={
             <SellerProtectedRoute>
               <ShopCreateProduct/>
+            </SellerProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/dashboard-products"
+          element={
+            <SellerProtectedRoute>
+              <ShopAllProducts/>
             </SellerProtectedRoute>
           }
         />

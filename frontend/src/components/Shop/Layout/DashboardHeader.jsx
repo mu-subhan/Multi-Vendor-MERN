@@ -7,9 +7,8 @@ import { Link } from "react-router-dom";
 import { BiMessageSquareDetail } from "react-icons/bi";
 import { backend_url } from "../../../server";
 
-
 const DashboardHeader = () => {
-  const { seller } = useSelector((state) => state.seller);
+  const { seller, isLoading } = useSelector((state) => state.seller);
   
   return (
     <div className="w-full h-[80px] bg-white shadow sticky top-0 left-0 z-30 flex items-center justify-between px-4">
@@ -54,18 +53,15 @@ const DashboardHeader = () => {
               className="mx-5 cursor-pointer"
             />
           </Link>
-          <Link to={`/shop/${seller._id}`}>
-          
-            <img
-             src={
-                 seller.avatar?.url
-                   ? `${backend_url}uploads/${seller.avatar.url}`
-                   : "/default-avatar.png"
-             }
-              alt=""
-              className="w-[50px] h-[50px] rounded-full object-cover"
+          {!isLoading && seller && (
+            <Link to={`/shop/${seller._id}`}>
+              <img
+                src={seller.avatar?.url ? `${backend_url}uploads/${seller.avatar.url}` : "/default-avatar.png"}
+                alt=""
+                className="w-[50px] h-[50px] rounded-full object-cover"
               />
-          </Link>
+            </Link>
+          )}
         </div>
       </div>
     </div>
