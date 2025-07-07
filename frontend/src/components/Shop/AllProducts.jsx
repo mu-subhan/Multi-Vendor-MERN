@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { deleteProduct, getAllProductsShop } from '../../redux/actions/product';
 import {useDispatch, useSelector } from 'react-redux';
 import { AiOutlineDelete, AiOutlineEye } from "react-icons/ai";
@@ -7,6 +7,7 @@ import { Button } from '@mui/material';
 import { Link } from 'react-router-dom';
 import Loader from '../Layout/Loader';
 import { toast } from 'react-toastify';
+import styles from '../../styles/styles';
 // import {deleteProduct} from '../../redux/actions/product';
 
 const AllProducts = () => {
@@ -115,6 +116,7 @@ const AllProducts = () => {
                 <Loader />
             ) : (
                 <div className="w-full mx-8 pt-1 mt-10 bg-white">
+    
                     <DataGrid
                         rows={row}
                         columns={columns}
@@ -127,6 +129,7 @@ const AllProducts = () => {
                         }}
                         pageSizeOptions={[10, 20, 30]}
                     />
+                   
                 </div>
             )}
         </>

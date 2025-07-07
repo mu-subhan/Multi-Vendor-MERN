@@ -25,7 +25,7 @@ import { loadSeller, loadUser } from "./redux/actions/user";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import SellerProtectedRoute from "./routes/SellerProtectedRoute";
 import {ShopHomePage} from "./ShopRoutes"
-import {ShopDashboardPage,ShopCreateProduct,ShopAllProducts,ShopCreateEvent,ShopAllEvent} from "./routes/ShopRoutes"
+import {ShopDashboardPage,ShopCreateProduct,ShopAllProducts,ShopCreateEvent,ShopAllEvent,ShopAllCoupouns} from "./routes/ShopRoutes"
 
 function App() {
    
@@ -120,6 +120,15 @@ function App() {
           element={
             <SellerProtectedRoute>
               <ShopAllEvent/>
+            </SellerProtectedRoute>
+          }
+        />
+
+         <Route
+          path="/dashboard-coupouns"
+          element={
+            <SellerProtectedRoute>
+              <ShopAllCoupouns/>
             </SellerProtectedRoute>
           }
         />
