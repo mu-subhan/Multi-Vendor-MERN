@@ -1,10 +1,10 @@
+
 import React, { useEffect, useState } from 'react'
-import { deleteProduct, getAllProductsShop } from '../../redux/actions/product';
 import { useDispatch, useSelector } from 'react-redux';
-import { AiOutlineDelete, AiOutlineEye } from "react-icons/ai";
+import { AiOutlineDelete } from "react-icons/ai";
+import { getAllCoupons, deleteCoupon } from '../../redux/actions/coupon';
 import { DataGrid } from '@mui/x-data-grid';
 import { Button } from '@mui/material';
-import { Link } from 'react-router-dom';
 import Loader from '../Layout/Loader';
 import { toast } from 'react-toastify';
 import styles from '../../styles/styles';
@@ -16,74 +16,63 @@ const AllCoupons = () => {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [value, setValue] = useState("");
-  const [couponCode, setCouponCode] = useState([]);
   const [minAmount, setMinAmout] = useState(null);
   const [maxAmount, setMaxAmount] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState("");
-  const { products, error, message } = useSelector((state) => state.products);
+
+  const { products } = useSelector((state) => state.products);
+  const { coupons, isLoading, error, message } = useSelector((state) => state.coupons);
   const { seller } = useSelector((state) => state.seller);
   const dispatch = useDispatch();
 
   useEffect(() => {
-   setIsLoading(true);
-   axios.get(`${server}/coupon/get-coupon/${seller._id}`, { withCredentials: true })
-     .then((res) => {
-      //  console.log(res.data);
-       setIsLoading(false);
-       setCouponCode(res.data.coupons || []);
-     })
-     .catch((err) => {
-      //  console.log(err);
-       setIsLoading(false);
-     });
+    if (seller && seller._id) {
+      dispatch(getAllCoupons(seller._id));
+    }
   }, [dispatch, seller]);
 
   useEffect(() => {
     if (error) {
       toast.error(error);
       dispatch({ type: "clearErrors" });
+      
     }
     if (message) {
       toast.success(message);
       dispatch({ type: "clearMessages" });
-      dispatch(getAllProductsShop(seller._id));
+      dispatch(getAllCoupons(seller._id));
     }
-  }, [error, message, dispatch, seller._id]);
+  }, [dispatch, error, message, seller._id]);
 
   const handleDelete = (id) => {
-    dispatch(deleteProduct(id));
+    dispatch(deleteCoupon(id));
   };
 
   const handleSubmit = async(e) => {
-  e.preventDefault();
-  await axios.post(`${server}/coupon//create-coupon-code`,{
-    name,
-    value,
-    minAmount,
-    maxAmount,
-    selectedProducts,
-    shop:seller,
-  },{withCredentials: true})
-    .then((res) => {
-      toast.success("Coupon code created successfully!");
-      // setOpen(false);
-      // setName("");
-      // setValue("");
-      // setMinAmout(null);
-      // setMaxAmount(null);
-      // setSelectedProducts("");
-      setOpen(false);
-      window.location.reload();
-    })
-    .catch((err) => {
-      toast.error(err.response.data.message || "Failed to create coupon code");
-  }
-)
+    e.preventDefault();
+    await axios.post(`${server}/coupon/create-coupon-code`, {
+      name,
+      value,
+      minAmount,
+      maxAmount,
+      selectedProducts,
+      shop: {
+        _id: seller._id,
+        name: seller.name,
+      },
+    }, { withCredentials: true })
+      .then((res) => {
+        toast.success("Coupon code created successfully!");
+        setOpen(false);
+        dispatch(getAllCoupons(seller._id));
+      })
+      .catch((err) => {
+        toast.error(err.response.data.message || "Failed to create coupon code");
+      });
   }
 
   const columns = [
-    { field: "id", headerName: "Product Id", minWidth: 150, flex: 0.7 },
+    { field: "id", headerName: "Coupon ID", minWidth: 150, flex: 0.7 },
     {
       field: "name",
       headerName: "Name",
@@ -92,21 +81,24 @@ const AllCoupons = () => {
     },
     {
       field: "price",
-      headerName: "Price",
+      headerName: "Value",
       minWidth: 100,
       flex: 0.6,
     },
     {
       field: "Delete",
-      headerName: "Delete",
-      minWidth: 120,
       flex: 0.8,
+      minWidth: 120,
+      headerName: "",
+      type: "number",
       sortable: false,
       renderCell: (params) => {
         return (
-          <Button onClick={() => handleDelete(params.row.id)}>
-            <AiOutlineDelete size={20} />
-          </Button>
+          <>
+            <Button onClick={() => handleDelete(params.id)}>
+              <AiOutlineDelete size={20} />
+            </Button>
+          </>
         );
       },
     },
@@ -114,13 +106,12 @@ const AllCoupons = () => {
 
   const row = [];
 
-  couponCode &&
-    couponCode.forEach((item) => {
+  coupons &&
+    coupons.forEach((item) => {
       row.push({
         id: item._id,
         name: item.name,
-        price: item.value,
-       
+        price: item.value + "%",
       });
     });
 
@@ -135,7 +126,6 @@ const AllCoupons = () => {
               <span className='text-white'>
                 Create Copoun Code
               </span>
-
             </div>
           </div>
           <DataGrid
@@ -156,19 +146,18 @@ const AllCoupons = () => {
                 <div className="bg-white p-4 rounded-md shadow w-[90%] 800px:w-[40%] h-[80vh]">
                   <div className="w-full flex justify-end">
                     <RxCross1 size={25} className="cursor-pointer" onClick={() => setOpen(false)} />
-
                   </div>
                   <h5 className="text-[30px] font-Poppins text-center">
                     Create Coupon code
                   </h5>
                   {/* create coupoun code */}
                   <form onSubmit={handleSubmit} aria-required={true}>
-                    <br />
-                    <div>
-                      <label className="pb-2">
-                        Name <span className="text-red-500">*</span>
-                      </label>
-                      <input
+                  <br />
+                     <div>
+                       <label className="pb-2">
+                         Name <span className="text-red-500">*</span>
+                       </label>
+                       <input
                         type="text"
                         name="name"
                         required
