@@ -38,10 +38,10 @@ router.get(
   isSeller,
   catchAsyncError(async (req, res, next) => {
     try {
-      const couponCodes = await CoupounCode.find({ shopId: req.seller.id });
+      const couponCodes = await CoupounCode.find({ "shop._id": req.params.id });
       res.status(201).json({
         success: true,
-        couponCodes,
+        coupons: couponCodes,
       });
     } catch (error) {
       return next(new ErrorHandler(error, 400));
@@ -50,25 +50,33 @@ router.get(
 );
 
 // delete coupoun code of a shop
-// router.delete(
-//   "/delete-coupon/:id",
-//   isSeller,
-//   catchAsyncErrors(async (req, res, next) => {
-//     try {
-//       const couponCode = await CoupounCode.findByIdAndDelete(req.params.id);
+router.delete(
+  "/delete-coupon/:id",
+  isSeller,
+  catchAsyncError(async (req, res, next) => {
+    try {
+      const couponCode = await CoupounCode.findById(req.params.id);
+      
+      if (!couponCode) {
+        return next(new ErrorHandler("Coupon code doesn't exist!", 400));
+      }
 
-//       if (!couponCode) {
-//         return next(new ErrorHandler("Coupon code dosen't exists!", 400));
-//       }
-//       res.status(201).json({
-//         success: true,
-//         message: "Coupon code deleted successfully!",
-//       });
-//     } catch (error) {
-//       return next(new ErrorHandler(error, 400));
-//     }
-//   })
-// );
+      // Check if the seller owns this coupon
+      if (couponCode.shop._id.toString() !== req.seller._id.toString()) {
+        return next(new ErrorHandler("You are not authorized to delete this coupon", 403));
+      }
+
+      await CoupounCode.findByIdAndDelete(req.params.id);
+
+      res.status(200).json({
+        success: true,
+        message: "Coupon code deleted successfully!",
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  })
+);
 
 // get coupon code value by its name
 // router.get(
