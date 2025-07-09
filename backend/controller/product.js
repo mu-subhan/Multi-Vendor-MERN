@@ -12,40 +12,98 @@ const fs = require('fs');
 router.post("/create-product", upload.array("images"), catchAsyncError(async (req, res, next) => {
     try {
         const shopId = req.body.shopId;
-        const shop = await Shop.findById(shopId)
-        if (!shop) {
-            return next(new ErrorHandler("Shop Id is invalid", 400))
-        } else {
-            const files = req.files;
-            const imageUrls = files.map((file) => `${file.filename}`);
-            const productData = req.body;
-            productData.images = imageUrls;
-            productData.shop = shop;
-            productData.shopId = shopId;
-            
-            const product = await Product.create(productData)
-
-            res.status(201).json({
-                success: true,
-                product,
-            })
+        
+        if (!shopId) {
+            return next(new ErrorHandler("Shop ID is required", 400));
         }
 
+        if (!req.files || req.files.length === 0) {
+            return next(new ErrorHandler("At least one product image is required", 400));
+        }
+
+        const shop = await Shop.findById(shopId);
+        if (!shop) {
+            return next(new ErrorHandler("Shop not found", 404));
+        }
+
+        const { name, description, category, originalPrice, discountPrice, stock } = req.body;
+
+        // Validate required fields
+        if (!name || !description || !category || !discountPrice || !stock) {
+            return next(new ErrorHandler("Please fill all required fields", 400));
+        }
+
+        const files = req.files;
+        const imageUrls = files.map((file) => `${file.filename}`);
+            
+        const productData = {
+            name,
+            description,
+            category,
+            originalPrice,
+            discountPrice,
+            stock,
+            images: imageUrls,
+            shop,
+            shopId
+        };
+            
+        const product = await Product.create(productData);
+
+        res.status(201).json({
+            success: true,
+            product,
+        });
+
     } catch (error) {
-        return next(new ErrorHandler(error, 400))
+        console.error("Product creation error:", error);
+        return next(new ErrorHandler(error.message || "Error creating product", 400));
     }
-}))
+}));
+
+// get all products
+router.get("/get-all-products", catchAsyncError(async (req, res, next) => {
+    try {
+        const products = await Product.find().populate("shop");
+        
+        // Add full URLs to images
+        const productsWithUrls = products.map(product => {
+            const productObj = product.toObject();
+            productObj.images = productObj.images.map(img => ({
+                url: img.url || `${process.env.BACKEND_URL}/uploads/${img}`
+            }));
+            return productObj;
+        });
+        
+        res.status(200).json({
+            success: true,
+            products: productsWithUrls,
+        });
+    } catch (error) {
+        return next(new ErrorHandler(error, 400));
+    }
+}));
 
 // get all products of shop
 router.get("/get-all-products-shop/:id", catchAsyncError(async (req, res, next) => {
     try {
         console.log("Fetching products for shop ID:", req.params.id);
         const products = await Product.find({ shopId: req.params.id });
-        console.log("Found products:", products);
+        
+        // Add full URLs to images
+        const productsWithUrls = products.map(product => {
+            const productObj = product.toObject();
+            productObj.images = productObj.images.map(img => ({
+                url: img.url || `${process.env.BACKEND_URL}/uploads/${img}`
+            }));
+            return productObj;
+        });
+        
+        console.log("Found products:", productsWithUrls);
         
         res.status(200).json({
             success: true,
-            products,
+            products: productsWithUrls,
         })
     } catch (error) {
         console.error("Error fetching products:", error);
@@ -66,7 +124,8 @@ router.delete("/delete-shop-product/:id", isSeller, catchAsyncError(async (req, 
         // Delete product images from storage
         for (let i = 0; i < product.images.length; i++) {
             const result = product.images[i];
-            const filePath = `uploads/${result}`;
+            const filename = result.url ? result.url.split('/').pop() : result;
+            const filePath = `uploads/${filename}`;
             fs.unlink(filePath, (err) => {
                 if (err) {
                     console.log(err);
