@@ -8,7 +8,10 @@ export const createevent = (newForm) => async (dispatch) =>{
         dispatch({
             type:"eventCreateRequest",
         })
-        const config = {headers:{"Content-Type":"multipart/form-data"}}
+        const config = {
+            headers: {"Content-Type":"multipart/form-data"},
+            withCredentials: true
+        }
         const {data}= await axios.post(`${server}/event/create-event`,
             newForm,
             config
@@ -20,40 +23,50 @@ export const createevent = (newForm) => async (dispatch) =>{
     } catch (error) {
         dispatch({
         type:"eventCreateFail",
-        payload: error.response.data.message,
+        payload: error.response?.data?.message || "Failed to create event",
    })
     }
 };
 
+// get all events of a shop
+export const getAllEventsShop = (id) => async (dispatch) => {
+  try {
+    dispatch({
+      type: "getAllEventsShopRequest",
+    });
+
+    const { data } = await axios.get(`${server}/event/get-all-events/${id}`);
+    dispatch({
+      type: "getAllEventsShopSuccess",
+      payload: data.events,
+    });
+  } catch (error) {
+    dispatch({
+      type: "getAllEventsShopFailed",
+      payload: error.response.data.message,
+    });
+  }
+};
+
 // get all events
-export const getAlleventsShop = (id) => async (dispatch) =>{
-    try {
-        dispatch({
-            type:"getAlleventsShopRequest",
-        });
+export const getAllEvents = () => async (dispatch) => {
+  try {
+    dispatch({
+      type: "getAlleventsRequest",
+    });
 
-        
-        const {data} = await axios.get(`${server}/event/get-all-events/${id}`)
-
-        if (data.success) {
-            dispatch({
-                type:"getAlleventsShopSuccess",
-                payload: data.events,
-            })
-        } else {
-            dispatch({
-                type:"getAlleventsShopFailed",
-                payload: "Failed to fetch events",
-            });
-        }
-    } catch (error) {
-        console.error("Error fetching events:", error);
-        dispatch({
-            type:"getAlleventsShopFailed",
-            payload: error.response?.data?.message || "Failed to fetch events",
-        });
-    }
-}
+    const { data } = await axios.get(`${server}/event/get-all-events`);
+    dispatch({
+      type: "getAlleventsSuccess",
+      payload: data.events,
+    });
+  } catch (error) {
+    dispatch({
+      type: "getAlleventsFailed",
+      payload: error.response.data.message,
+    });
+  }
+};
 
 // delete event of a shop
 export const deleteEvent = (id) => async (dispatch) => {

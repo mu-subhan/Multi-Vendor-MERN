@@ -1,14 +1,12 @@
 import React, { useEffect } from 'react'
-import { deleteProduct, getAllProductsShop } from '../../redux/actions/product';
-import {useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { AiOutlineDelete, AiOutlineEye } from "react-icons/ai";
 import { DataGrid } from '@mui/x-data-grid';
 import { Button } from '@mui/material';
 import { Link } from 'react-router-dom';
 import Loader from '../Layout/Loader';
 import { toast } from 'react-toastify';
-import { deleteEvent, getAlleventsShop } from '../../redux/actions/event';
-// import {deleteProduct} from '../../redux/actions/product';
+import { deleteEvent, getAllEventsShop } from '../../redux/actions/event';
 
 const AllEvent = () => {
     const {events, isLoading, error, message} = useSelector((state) => state.events);
@@ -17,9 +15,9 @@ const AllEvent = () => {
 
     useEffect(() => {
         if(seller?._id) {
-            dispatch(getAlleventsShop(seller._id));
+            dispatch(getAllEventsShop(seller._id));
         }
-    }, [dispatch]);
+    }, [dispatch, seller?._id]);
 
     useEffect(() => {
         if(error) {
@@ -29,13 +27,12 @@ const AllEvent = () => {
         if(message) {
             toast.success(message);
             dispatch({ type: "clearMessages" });
-            dispatch(getAlleventsShop(seller._id));
+            dispatch(getAllEventsShop(seller._id));
         }
-    }, [error, message, dispatch, seller._id]);
+    }, [error, message, dispatch, seller?._id]);
 
     const handleDelete = (id) => {
       dispatch(deleteEvent(id));
-    //   window.location.reload();
     };
 
     const columns = [
@@ -134,4 +131,5 @@ const AllEvent = () => {
         </>
     );
 };
-export default AllEvent
+
+export default AllEvent;

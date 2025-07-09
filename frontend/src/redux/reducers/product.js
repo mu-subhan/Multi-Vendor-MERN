@@ -10,6 +10,19 @@ const initialState = {
 
 export const productReducer = createReducer(initialState, (builder) => {
   builder
+    // Get all products
+    .addCase('getAllProductsRequest', (state) => {
+      state.isLoading = true;
+    })
+    .addCase('getAllProductsSuccess', (state, action) => {
+      state.isLoading = false;
+      state.products = action.payload;
+    })
+    .addCase('getAllProductsFailed', (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload;
+    })
+    // Create product
     .addCase('productCreateRequest', (state) => {
       state.isLoading = true;
     })

@@ -2,6 +2,8 @@ import React, { act, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 import styles from '../../styles/styles';
 import { AiFillHeart, AiOutlineHeart, AiOutlineMessage, AiOutlineShoppingCart } from 'react-icons/ai';
+import { backend_url } from '../../server';
+
 
 const ProductDetails = ({data}) => {
  
@@ -30,17 +32,27 @@ const ProductDetails = ({data}) => {
                 <div className="w-full py-5">
                     <div className="block w-full 800px:flex">
                         <div className="w-full 800px:w-[50%]">
-                            <img src={data.image_Url[select].url} alt="" className='w-[80%]'/>
+                            <img 
+                            src={`${backend_url}${data && data.images && data.images[select].url}`}
+                            // src="" 
+                            alt="" 
+                             className='w-[80%]'/>
 
                             <div className='w-full flex p-6'>
                                 <div className={`${select === 0 ? "border" : "null"} cursor-pointer`}>
-                                    <img src={data?.image_Url[0].url} alt=''
+                                    <img 
+                                    // src={data?.image_Url[0].url} alt=''
+                                    src={`${backend_url}${data.images && data.images[0].url}`}
+                                    alt=''
                                     className='h-[200px]'
                                     onClick={()=>setSelect(0)}/>
                                     </div>
 
                                     <div className={`${select === 1 ? "border" : "null"} cursor-pointer pl-5`}>
-                                    <img src={data?.image_Url[1].url} alt=''
+                                    <img 
+                                    // src={data?.image_Url[1].url}
+                                    src={`${backend_url}${data.images && data.images[1].url}`}
+                                    alt=''
                                     className=' h-[200px]'
                                     onClick={()=>setSelect(1)}/>
                                     </div>
@@ -53,10 +65,10 @@ const ProductDetails = ({data}) => {
                            <p>{data.description}</p>
                            <div className="flex pt-3">
                             <h4 className={`${styles.productDiscountPrice}`}>
-                                {data.discount_price}$
+                                {data.discountPrice}$
                             </h4>
                             <h3 className={`${styles.price}`}>
-                                {data.price ? data.price + "$":null}
+                                {data.originalPrice ? data.originalPrice + "$":null}
 
                             </h3>
                            </div>
@@ -99,7 +111,10 @@ const ProductDetails = ({data}) => {
                             </div>
 
                             <div className='flex items-center pt-8'>
-                                <img src={data.shop.shop_avatar.url} alt=''
+                                <img 
+                                // src={data.shop.shop_avatar.url} alt=''
+                                src={`${backend_url}${data?.shop?.avatar}`}
+                                alt=''
                                 className='w-[50px] h-[50px] rounded-full mr-2'/>
                                 <div className='pr-8'>
                                     <h3 className={`${styles.shop_name} pb-1 pt-1`}>
@@ -107,7 +122,7 @@ const ProductDetails = ({data}) => {
                                     </h3>
                                     <h5 className='
                                     pb-3 text-[15px]'>
-                                        ({data.shop.ratings}) Rating
+                                        ({data.shop.ratings} || 4/5 ) Rating
                                     </h5>
                                 </div>
                                 <div className={`${styles.button} bg-[#6443d1] !rounded !h-11`}>
@@ -186,14 +201,9 @@ Seller Information
                 active === 1 ? (
 <>
                  <p className='py-2 text-[#18px] leading-8 pb-10 whitespace-pre-line'>
-                    Product details are a curcial part of ant eCommerce website or online marketplace. These details help the ppotentials customers to make an informed desciion about the product . They are interested in buting. A well-written product description can also be a powerful marketing tool that can help to increase sales. Product details typically include information about the products features, specification, dimension,weight, materials, and other relevent information that can help language and be honest and transparent about the products features and linitations 
+                  {data.description}
                     </p>
-                    <p className='py-2 text-[#18px] leading-8 pb-10 whitespace-pre-line'>
-                   Customer to understand the product better. The product details sectin should also include gigh quality images and videos of the product details it is essential to keep the target audience in mind. The language used should be clear and est to understand. technical terms should be explained in simple language . The tone of profuct dettails shoul be persuasive, highlighting the unique features of the products
-                    </p>
-                    <p className='py-2 text-[#18px] leading-8 pb-10 whitespace-pre-line'>
-                   Customer to understand the product better. The product details sectin should also include gigh quality images and videos of the product details it is essential to keep the target audience in mind. The language used should be clear and est to understand. technical terms should be explained in simple language . The tone of profuct dettails shoul be persuasive, highlighting the unique features of the products
-                    </p>
+                
                     </>        
 
                 ) : null
@@ -212,31 +222,31 @@ Seller Information
                     <div className="w-full block 800px:flex p-5">
                         <div className="w-full 800px:w-[50%]">
                             <div className='flex items-center'>
-                                <img src={data.shop.shop_avatar.url}
+                                <img src={`${backend_url}${data?.shop?.avatar}`}
+                                // {data.shop.shop_avatar.url}
                                 alt=''
                                 className='w-[50px] h-[50px] rounded-full'/>
                                 <div className='pl-3'>
                                     <h3 className={`${styles.shop_name}`}>{data.shop.name}</h3>
                                     <h5 className='pb-3 text-[15px]'>
-                                        ({data.shop.ratings}) Ratings
+                                        {data.shop.ratings || 4/5}  Ratings
                                     </h5>
                                     </div>
                                 <p className='pt-2'>
-                                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Mollitia eos sed velit dignissimos ratione nesciunt tenetur, ab neque obcaecati ea illum nisi, ullam cupiditate aspernatur cumque sunt? Nulla, assumenda aliquam.
-                                </p>
+{data.shop.description}                                </p>
                                 </div>
                         </div>
 
                         <div className="w-full 800px:w-[50%] mt-5 800px:mt-0 800px:flex flex-col items-end">
                <div className="text-left">
                 <h5 className="font-[600]">
-Joined on: <span className='font-[500]'>5 FEB,2025</span>
+Joined on: <span className='font-[500]'> {data.shop?.createAt.slice(0,5) || "N/A"}</span>
                 </h5>
                 <h5 className='font-[600] pt-3'>
-                    Total Products: <span className='font-[500]'>1,324</span>
+                    Total Products: <span className='font-[500]'>{data.shop || 0} </span>
                 </h5>
                 <h5 className='font-[600] pt-3'>
-                    Total Reviews: <span className='font-[500]'>124</span>
+                    Total Reviews: <span className='font-[500]'>33</span>
                 </h5>
                 <Link to='/'>
                 <div className={`${styles.button} !rounded-[4px] !h-[39px] mt-3`}>
