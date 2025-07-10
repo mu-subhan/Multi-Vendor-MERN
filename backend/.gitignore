@@ -8,7 +8,7 @@
 /build
 
 #upload 
-/uploads
+# /uploads
 # misc
 .DS_Store
 .env
