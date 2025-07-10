@@ -7,29 +7,28 @@ const EventCard = ({active,data}) => {
     <div className={`w-full block bg-white rounded-lg ${active ? "unset" :"mb-12"} lg:flex p-2`}>
         <div className='w-full lg:w-[50%] m-auto'>
             <img src={`${backend_url}${data ? data.images[0] : ""}`} alt=''/>
-            </div>
-      <div className="w-full lg:[w-50%] flex flex-col justify-center">
-        <h2 className={`${styles.productTitle}`}>
-            {data ? data.name : "Event Name Here"}
-        </h2>
-        <p>
-           {data ? data.description : "Event Description Here"}
-        </p>
-        <div className='flex py-2 justify-between'>
-            <div className='flex'>
-                <h5 className='font-[500] text-[18px] text-[#d55b45] pr-3 line-through'>
-                    {data ? data.originalPrice : "missing"}
-                </h5>
-                <h5 className='font-bold text-[20px] text-black font-Roboto'>
-                    {data ? data.price : "missing"}
-                </h5>
-            </div>
-            <span className='pr-3 font-[400] text-[17px] text-[#44a55e]'>
-                120 Sold
-            </span>
         </div>
-            <CountDown data={data}
-                         />
+        <div className="w-full lg:[w-50%] flex flex-col justify-center">
+            <h2 className={`${styles.productTitle}`}>
+                {data?.name || "Event Name Here"}
+            </h2>
+            <p>
+               {data?.description || "Event Description Here"}
+            </p>
+            <div className='flex py-2 justify-between'>
+                <div className='flex'>
+                    <h5 className='font-[500] text-[18px] text-[#d55b45] pr-3 line-through'>
+                        ${data?.originalPrice || 0}
+                    </h5>
+                    <h5 className='font-bold text-[20px] text-black font-Roboto'>
+                        ${data?.discountPrice || 0}
+                    </h5>
+                </div>
+                <span className='pr-3 font-[400] text-[17px] text-[#44a55e]'>
+                    {data?.sold_out || 0} Sold
+                </span>
+            </div>
+            <CountDown data={data} />
         </div>  
     </div>
   )

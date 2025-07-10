@@ -2,27 +2,17 @@ import { createReducer } from "@reduxjs/toolkit";
 
 const initialState = {
   isLoading: true,
-  product: null,
-  products: [],
   success: false,
   error: null,
+  product: null,
+  products: [],
+  allProducts: [],
+  message: null,
 };
 
 export const productReducer = createReducer(initialState, (builder) => {
   builder
-    // Get all products
-    .addCase('getAllProductsRequest', (state) => {
-      state.isLoading = true;
-    })
-    .addCase('getAllProductsSuccess', (state, action) => {
-      state.isLoading = false;
-      state.products = action.payload;
-    })
-    .addCase('getAllProductsFailed', (state, action) => {
-      state.isLoading = false;
-      state.error = action.payload;
-    })
-    // Create product
+    // Product creation
     .addCase('productCreateRequest', (state) => {
       state.isLoading = true;
     })
@@ -37,7 +27,7 @@ export const productReducer = createReducer(initialState, (builder) => {
       state.success = false;
     })
 
-    // Get all products of shop 
+    // Get all products of the shop
     .addCase('getAllProductsShopRequest', (state) => {
       state.isLoading = true;
     })
@@ -48,20 +38,35 @@ export const productReducer = createReducer(initialState, (builder) => {
     .addCase('getAllProductsShopFailed', (state, action) => {
       state.isLoading = false;
       state.error = action.payload;
-      state.products = [];
     })
-    // delete product of shop
-    .addCase("deleteProductRequest",(state)=>{
-      state.isLoading= true;
+
+    // Delete product of a shop
+    .addCase('deleteProductRequest', (state) => {
+      state.isLoading = true;
     })
-    .addCase("deleteProductSuccess",(state,action)=>{
-      state.isLoading= false;
-      state.message=action.payload;
+    .addCase('deleteProductSuccess', (state, action) => {
+      state.isLoading = false;
+      state.message = action.payload;
     })
-    .addCase("deleteProductFailed",(state,action)=>{
-      state.isLoading=false;
-      state.error= action.payload
+    .addCase('deleteProductFailed', (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload;
     })
+
+    // Get all products
+    .addCase('getAllProductsRequest', (state) => {
+      state.isLoading = true;
+    })
+    .addCase('getAllProductsSuccess', (state, action) => {
+      state.isLoading = false;
+      state.allProducts = action.payload;
+    })
+    .addCase('getAllProductsFailed', (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload;
+    })
+
+    // Clear errors
     .addCase('clearErrors', (state) => {
       state.error = null;
     });
