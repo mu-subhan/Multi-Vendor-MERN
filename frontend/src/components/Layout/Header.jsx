@@ -28,7 +28,7 @@ const Header = ({ activeHeading }) => {
   const [active, setActive] = useState(null);
   const [dropDown, setDropDown] = useState(null);
   const [openCart, setOpenCart] = useState(false);
-  const [openWishList, setOpenWishList] = useState(false);
+  const [openWishlist, setOpenWishlist] = useState(false);
   const [open, setOpen] = useState(false);
 
   // console.log(user)
@@ -79,14 +79,13 @@ const Header = ({ activeHeading }) => {
               <div className="absolute min-h-[30vh] bg-slate-50 shadow-sm-2 z-[9] p-4">
                 {searchData &&
                   searchData.map((i, index) => {
-                    const d = i.name;
-
-                    const Product_name = d.replace(/\s+/g, "-");
+                  
                     return (
-                      <Link to={`/product/${Product_name}`}>
+                      <Link to={`/product/${i._id}`}>
                         <div className="w-full flex items-start-py-3">
                           <img
-                            src={i.image_Url[0].url}
+                            // src={i.image_Url[0].url}
+                            src={`${backend_url}${i.image_Url[0]?.url}`}
                             alt=""
                             className="w-[40px] h-[40px] mr-[10px]"
                           />
@@ -184,11 +183,9 @@ const Header = ({ activeHeading }) => {
 {searchData && (
                   <div className="absolute bg-[#fff] z-10 shadow w-full left-0 p-3">
                     {searchData.map((i) => {
-                      const d = i.name;
-
-                      const Product_name = d.replace(/\s+/g, "-");
+                    
                       return (
-                        <Link to={`/product/${Product_name}`}>
+                        <Link to={`/product/${i._id}`}>
                           <div className="flex items-center">
                             <img
                               src={i.image_Url[0]?.url}
@@ -291,7 +288,7 @@ const Header = ({ activeHeading }) => {
           <div className={`${styles.normalFlex}`}>
             <div
               className="relative cursor-pointer mr-[15px]"
-              onClick={() => setOpenWishList(true)}
+              onClick={() => setOpenWishlist(true)}
             >
               <AiOutlineHeart size={30} color="rgb(255 255 255 /83%)" />
               <span className="absolute right-0 top-0 rounded-full bg-[#3bc177] w-4 h-4 top right p-0 m-0 text-white font-mono text-[12px] leading-tight text-center">
@@ -335,8 +332,8 @@ const Header = ({ activeHeading }) => {
 
             {/* Wishlist Popup*/}
 
-            {openWishList ? (
-              <Wishlist setOpenWishList={setOpenWishList} />
+            {openWishlist ? (
+              <Wishlist setOpenWishlist={setOpenWishlist} />
             ) : null}
           </div>
         </div>
