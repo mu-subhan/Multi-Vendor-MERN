@@ -8,7 +8,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { getAllProductsShop } from "../../redux/actions/product";
-import { server } from "../../server";
+import { backend_url, server } from "../../server";
 import styles from "../../styles/styles";
 import {
   addToWishlist,
@@ -208,7 +208,7 @@ const ProductDetails = ({ data }) => {
                 <div className="flex items-center pt-8">
                   <Link to={`/shop/${data?.shop._id}`}>
                     <img
-                      src={`${data?.shop?.avatar.url}`}
+                      src={`${backend_url}${data?.shop?.images?.url}`}
                       alt=""
                       className="w-[50px] h-[50px] rounded-full mr-2"
                     />

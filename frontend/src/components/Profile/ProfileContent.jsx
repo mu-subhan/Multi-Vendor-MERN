@@ -1,44 +1,124 @@
-import React, { useState } from "react";
-import { backend_url } from "../../server";
+import React, { useEffect, useState } from "react";
+import { backend_url, server } from "../../server";
 import { useSelector } from "react-redux";
 import { AiOutlineArrowRight, AiOutlineCamera, AiOutlineDelete } from "react-icons/ai";
 import { MdOutlineTrackChanges, MdTrackChanges } from "react-icons/md";
 import styles from "../../styles/styles";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 // import AllOrders from "./AllOrders";
 import { DataGrid } from '@mui/x-data-grid';
 import { Button } from "@mui/material";
 import visa from "../../assests/visa.png"
-
-
+import { updateUserInformation, loadUser } from "../../redux/actions/user";
+import {toast} from "react-toastify";
+import { useDispatch } from "react-redux";
+import axios from "axios";
 
 const ProfileContent = ({ active }) => {
-  const { user } = useSelector((state) => state.user);
-  const [name, setName] = useState(user && user.name);
-  const [email, setEmail] = useState(user && user.email);
-  const [phoneNumber, setPhoneNumber] = useState();
-  const [zipCode, setZipCode] = useState();
-  const [address1, setAddress1] = useState("");
-  const [address2, setAddress2] = useState("");
+    const { user, error, loading, isAuthenticated } = useSelector((state) => state.user);
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
 
-  const handleSubmit = (e) => {
+    useEffect(() => {
+        if (!isAuthenticated) {
+            navigate('/login');
+        }
+    }, [isAuthenticated, navigate]);
+
+    useEffect(() => {
+        if (error) {
+            toast.error(error);
+            if (error === "Please login to continue") {
+                navigate('/login');
+            }
+        }
+    }, [error, navigate]);
+
+  const [name, setName] = useState(user?.name || "");
+  const [email, setEmail] = useState(user?.email || "");
+  const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber || "");
+  const [password, setPassword] = useState("");
+  const [avatar, setAvatar] = useState(null);
+
+  // Update form fields when user data changes
+  useEffect(() => {
+    if (user) {
+      setName(user.name || "");
+      setEmail(user.email || "");
+      setPhoneNumber(user.phoneNumber || "");
+    }
+  }, [user]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      await dispatch(updateUserInformation(name, email, phoneNumber, password));
+      toast.success("Profile updated successfully!");
+      // Reload user data to get the latest updates
+      dispatch(loadUser());
+    } catch (error) {
+      toast.error("Failed to update profile");
+    }
   };
+
+  const handleImage = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setAvatar(file);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await axios.put(`${server}/user/update-avatar`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      });
+      
+      if (response.data.success) {
+        // Reload user data to get the updated avatar
+        dispatch(loadUser());
+        toast.success("Avatar updated successfully!");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Error uploading image");
+    }
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    return <div>Please login to view profile</div>;
+  }
+
   return (
     <div className="w-full">
       {/* profile page  */}
-
       {active === 1 && (
         <>
           <div className="flex justify-center w-full">
             <div className="relative">
               <img
-                src={user?.avatar.url}
-                alt="user-profile piture"
+                src={user?.avatar?.url || "/default-avatar.png"}
+                alt="user-profile picture"
                 className="w-[150px] h-[150px] rounded-full object-cover border-[3px] border-[#3ad132]"
               />
               <div className="w-[35px] h-[35px] bg-[#E3E9EE] rounded-full flex items-center justify-center cursor-pointer absolute bottom-[5px] right-[5px]">
-                <AiOutlineCamera />
+                <input
+                  type="file"
+                  id="image"
+                  className="hidden"
+                  onChange={handleImage}
+                  accept="image/*"
+                />
+                <label htmlFor="image" className="cursor-pointer">
+                  <AiOutlineCamera />
+                </label>
               </div>
             </div>
           </div>
@@ -48,10 +128,7 @@ const ProfileContent = ({ active }) => {
             <form onSubmit={handleSubmit} aria-required={true}>
               <div className="w-full 800px:flex block pb-3">
                 <div className="w-[100%] 800px:w-[50%]">
-                  <label
-                    className="
-                    block pb-2 font-bold"
-                  >
+                  <label className="block pb-2 font-bold">
                     Full Name
                   </label>
                   <input
@@ -64,10 +141,7 @@ const ProfileContent = ({ active }) => {
                 </div>
 
                 <div className="w-[100%] 800px:w-[50%]">
-                  <label
-                    className="
-                    block pb-2 font-bold"
-                  >
+                  <label className="block pb-2 font-bold">
                     Email Address
                   </label>
                   <input
@@ -78,15 +152,12 @@ const ProfileContent = ({ active }) => {
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
-                </div>
+              </div>
             
-            <div className="w-full 800px:flex block pb-3">
-                 <div className="w-[100%] 800px:w-[50%]">
-                  <label
-                    className="
-                    block pb-2 font-bold"
-                    >
-                    Phone Address
+              <div className="w-full 800px:flex block pb-3">
+                <div className="w-[100%] 800px:w-[50%]">
+                  <label className="block pb-2 font-bold">
+                    Phone Number
                   </label>
                   <input
                     type="number"
@@ -94,60 +165,23 @@ const ProfileContent = ({ active }) => {
                     required
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
-                    />
-                </div>
-
-                <div className="w-[100%] 800px:w-[50%]">
-                  <label
-                    className="
-                    block pb-2 font-bold"
-                    >
-                    Zip Code
-                  </label>
-                  <input
-                    type="number"
-                    className={`${styles.input} !w-[95%] mb-1 800px:mb-0`}
-                    required
-                    value={zipCode}
-                    onChange={(e) => setZipCode(e.target.value)}
-                    />
-                </div>
-                 </div>
-
-            <div className="w-full 800px:flex block pb-3">
-                 
-                <div className="w-[100%] 800px:w-[50%]">
-                  <label
-                    className="
-                    block pb-2 font-bold"
-                  >
-                    Address 1
-                  </label>
-                  <input
-                    type="address"
-                    className={`${styles.input} !w-[95%] mb-1 800px:mb-0`}
-                    required
-                    value={address1}
-                    onChange={(e) => setAddress1(e.target.value)}
                   />
                 </div>
-
+          
                 <div className="w-[100%] 800px:w-[50%]">
-                  <label
-                    className="
-                    block pb-2 font-bold"
-                  >
-                    Address 2
+                  <label className="block pb-2 font-bold">
+                    Password
                   </label>
                   <input
-                    type="address"
+                    type="password"
                     className={`${styles.input} !w-[95%] mb-1 800px:mb-0`}
                     required
-                    value={address2}
-                    onChange={(e) => setAddress2(e.target.value)}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
               </div>
+
               <input
                 className={`w-[15%] h-[40px] border border-[#3a24db] text-[#3a24db] rounded-[5px] mt-8 cursor-pointer`}
                 required

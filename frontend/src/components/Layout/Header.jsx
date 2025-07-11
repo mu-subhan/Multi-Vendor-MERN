@@ -19,14 +19,14 @@ import Wishlist from "../Wishlist/Wishlist";
 import { RxCross1 } from "react-icons/rx";
 
 const Header = ({ activeHeading }) => {
-  const { isAuthenticated, user } = useSelector((state) => state.user);
+  const { isAuthenticated, user, loading } = useSelector((state) => state.user);
   const { cart } = useSelector((state) => state.cart);
   const { wishlist } = useSelector((state) => state.wishlist);
-  const [searchTerm, setSearchTerm] = useState();
+  const [searchTerm, setSearchTerm] = useState("");
 
   const [searchData, setSearchData] = useState(null);
-  const [active, setActive] = useState(null);
-  const [dropDown, setDropDown] = useState(null);
+  const [active, setActive] = useState(false);
+  const [dropDown, setDropDown] = useState(false);
   const [openCart, setOpenCart] = useState(false);
   const [openWishlist, setOpenWishlist] = useState(false);
   const [open, setOpen] = useState(false);
@@ -49,6 +49,34 @@ const Header = ({ activeHeading }) => {
       setActive(false);
     }
   });
+
+  // Update the profile image rendering in both mobile and desktop views
+  const renderProfileImage = () => {
+    if (loading) return null;
+    
+    if (isAuthenticated && user) {
+      return (
+        <Link to="/profile">
+          <img
+            src={user?.avatar?.url || "/default-avatar.png"}
+            alt="profile"
+            className="w-[60px] h-[60px] rounded-full border-[3px] border-[#0eae88]"
+          />
+        </Link>
+      );
+    }
+    
+    return (
+      <>
+        <Link to="/login" className="text-[18px] pr-[10px] text-[#000000b7]">
+          Login /
+        </Link>
+        <Link to="/sign-up" className="text-[18px] text-[#000000b7]">
+          Sign up
+        </Link>
+      </>
+    );
+  };
 
   return (
     <>
@@ -216,32 +244,7 @@ const Header = ({ activeHeading }) => {
               <br />
 
               <div className="flex w-full justify-center">
-                {isAuthenticated ? (
-                  <div>
-                    <Link to="/profile">
-                      <img
-                        src={`${user.avatar?.url}`}
-                        alt=""
-                        className="w-[60px] h-[60px] rounded-full border-[3px] border-[#0eae88]"
-                      />
-                    </Link>
-                  </div>
-                ) : (
-                  <>
-                    <Link
-                      to="/login"
-                      className="text-[18px] pr-[10px] text-[#000000b7]"
-                    >
-                      Login /
-                    </Link>
-                    <Link
-                      to="/sign-up"
-                      className="text-[18px] text-[#000000b7]"
-                    >
-                      Sign up
-                    </Link>
-                  </>
-                )}
+                {renderProfileImage()}
               </div>
             </div>
           </div>
@@ -310,19 +313,7 @@ const Header = ({ activeHeading }) => {
 
             <div className={`${styles.normalFlex}`}>
               <div className="cursor-pointer relative mr-[15px]">
-                {isAuthenticated ? (
-                  <Link to="/profile">
-                    <img
-                      src={user.avatar.url}
-                      alt="profile"
-                      className="w-[110px] h-8 rounded-full"
-                    />
-                  </Link>
-                ) : (
-                  <Link to="/login">
-                    <CgProfile size={30} color="rgb(255 255 255 /83%)" />
-                  </Link>
-                )}
+                {renderProfileImage()}
               </div>
             </div>
 
