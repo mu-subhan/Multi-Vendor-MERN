@@ -60,10 +60,12 @@ export const productReducer = createReducer(initialState, (builder) => {
     .addCase('getAllProductsSuccess', (state, action) => {
       state.isLoading = false;
       state.allProducts = action.payload;
+      state.error = null;
     })
     .addCase('getAllProductsFailed', (state, action) => {
       state.isLoading = false;
       state.error = action.payload;
+      state.allProducts = [];
     })
 
     // Clear errors
