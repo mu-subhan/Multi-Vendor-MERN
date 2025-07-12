@@ -119,3 +119,60 @@ export const updateUserInformation =
       });
     }
   };
+
+  // update user Address
+  export const updateUserAddress = (
+    country,city,address1,address2,addressType
+  ) => async (dispatch)=>{
+    try {
+      dispatch({
+        type:"updateUserAddressRequest",
+      });
+      const {data} = await axios.put(`${server}/user/update-user-addresses`,
+      {
+        country,
+        city,
+        address1,
+        address2,
+        addressType,
+      },
+     { withCredentials:true},
+    );
+    dispatch({
+      type:"updateUserAddressSuccess",
+      payload:{
+        successMessage:"User address updated Successfully",
+        user:data.user,
+      }
+    });
+      
+    } catch (error) {
+      dispatch({
+        type:"updateUserAddressFailed",
+        payload:error.response.data.message,
+      })
+    }
+  }
+
+  // delete user Address
+  export const deleteUserAddress = (id) => async (dispatch) =>{
+    try {
+      dispatch({
+        type:"deleteUserAddressRequest",
+      })
+      const {data} = await axios.delete(`${server}/user/delete-user-address/${id}`,{withCredentials:true});
+
+      dispatch({
+        type:"deleteUserAddressSuccess",
+        payload:{
+          successMessage:"Address deleted successfully",
+          user:data.user,
+        },
+      })
+    } catch (error) {
+      dispatch({
+        type:"deleteUserAddressFailed",
+      payload:error.response.data.message,
+      })
+    }
+  }
