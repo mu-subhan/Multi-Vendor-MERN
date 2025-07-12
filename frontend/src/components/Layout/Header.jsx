@@ -6,12 +6,12 @@ import {
   AiOutlineSearch,
   AiOutlineShoppingCart,
 } from "react-icons/ai";
+import { FaUserCircle } from "react-icons/fa";
 import { categoriesData, productData } from "../../static/data";
 import { IoIosArrowDown, IoIosArrowForward } from "react-icons/io";
 import { BiMenuAltLeft } from "react-icons/bi";
 import DropDown from "./DropDown";
 import Navbar from "./Navbar";
-import { CgProfile } from "react-icons/cg";
 import { useSelector } from "react-redux";
 import { backend_url } from "../../server";
 import Cart from "../Cart/Cart";
@@ -60,7 +60,7 @@ const Header = ({ activeHeading }) => {
           <img
             src={user?.avatar?.url || "/default-avatar.png"}
             alt="profile"
-            className="w-[60px] h-[60px] rounded-full border-[3px] border-[#0eae88]"
+            className="w-32 h-12 object-cover rounded-full border-[3px] border-[#0eae88]"
           />
         </Link>
       );
@@ -69,11 +69,11 @@ const Header = ({ activeHeading }) => {
     return (
       <>
         <Link to="/login" className="text-[18px] pr-[10px] text-[#000000b7]">
-          Login /
+         <FaUserCircle className="w-12 h-12 mt-4" color="#fff" />
         </Link>
-        <Link to="/sign-up" className="text-[18px] text-[#000000b7]">
+        {/* <Link to="/sign-up" className="text-[18px] text-[#000000b7]">
           Sign up
-        </Link>
+        </Link> */}
       </>
     );
   };
