@@ -4,7 +4,7 @@ import { HiOutlineReceiptRefund, HiOutlineShoppingBag } from 'react-icons/hi'
 import { RxPerson } from 'react-icons/rx'
 import { useNavigate } from 'react-router-dom'
 import {MdOutlineTrackChanges} from "react-icons/md";
-import {TbAddressBook} from "react-icons/tb";
+import {TbAddressBook, TbPassword} from "react-icons/tb";
 import { server } from '../../server'
 import { toast } from 'react-toastify'
 import axios from "axios"
@@ -72,9 +72,9 @@ const logoutHandler = () => {
  
       <div className='flex items-center cursor-pointer w-full mb-8'
       onClick={()=>setActive(6)}>
-         <AiOutlineCreditCard size={30} color={active === 6 ? "red" : ""}/>
+         <TbPassword size={30} color={active === 6 ? "red" : ""}/>
          <span className={`pl-3 ${active === 6 ? "text-[red]" : ""} 800px:block hidden`}>
-            Payment Method
+            Change Password
          </span>
       </div>
 

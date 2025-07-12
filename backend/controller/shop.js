@@ -141,25 +141,51 @@ router.post("/login-shop", catchAsyncError(async (req, res, next) => {
         const { email, password } = req.body;
 
         if (!email || !password) {
-            return next(new ErrorHandler("Please provide all fields", 400));
+            return next(new ErrorHandler("Please provide both email and password", 400));
         }
-        const user = await Shop.findOne({ email }).select("+password");
-        console.log(user);
 
-        if (!user) {
-            return next(new ErrorHandler("User doest not exits!", 400));
+        // Log the attempt
+        console.log(`Login attempt for shop with email: ${email}`);
+
+        // Find shop with email and include password in the result
+        const shop = await Shop.findOne({ email }).select("+password");
+        
+        if (!shop) {
+            console.log(`No shop found with email: ${email}`);
+            return next(new ErrorHandler("Shop not found with this email", 401));
         }
-        const isPasswordValid = await user.comparePassword(password);
+
+        console.log(`Shop found, verifying password for: ${email}`);
+        
+        // Verify password
+        let isPasswordValid;
+        try {
+            isPasswordValid = await shop.comparePassword(password);
+        } catch (error) {
+            console.error(`Password comparison error for shop ${email}:`, error);
+            return next(new ErrorHandler("Error verifying password", 500));
+        }
 
         if (!isPasswordValid) {
-            return next(new ErrorHandler("Please provide correct information", 400));
+            console.log(`Invalid password for shop: ${email}`);
+            return next(new ErrorHandler("Invalid email or password", 401));
         }
-        sendShopToken(user, 201, res);
+
+        console.log(`Login successful for shop: ${email}`);
+        
+        // Send token
+        try {
+            await sendShopToken(shop, 200, res);
+        } catch (error) {
+            console.error(`Token generation error for shop ${email}:`, error);
+            return next(new ErrorHandler("Error generating authentication token", 500));
+        }
 
     } catch (error) {
-        return next(new ErrorHandler(error.message, 500));
+        console.error("Shop login error:", error);
+        return next(new ErrorHandler(error.message || "Internal server error during login", 500));
     }
-}))
+}));
 
 
 // load shop

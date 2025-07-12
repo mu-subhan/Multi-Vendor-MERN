@@ -6,12 +6,12 @@ import {
   AiOutlineSearch,
   AiOutlineShoppingCart,
 } from "react-icons/ai";
+import { FaUserCircle } from "react-icons/fa";
 import { categoriesData, productData } from "../../static/data";
 import { IoIosArrowDown, IoIosArrowForward } from "react-icons/io";
 import { BiMenuAltLeft } from "react-icons/bi";
 import DropDown from "./DropDown";
 import Navbar from "./Navbar";
-import { CgProfile } from "react-icons/cg";
 import { useSelector } from "react-redux";
 import { backend_url } from "../../server";
 import Cart from "../Cart/Cart";
@@ -19,13 +19,16 @@ import Wishlist from "../Wishlist/Wishlist";
 import { RxCross1 } from "react-icons/rx";
 
 const Header = ({ activeHeading }) => {
-  const { isAuthenticated, user } = useSelector((state) => state.user);
-  const [searchTerm, setSearchTerm] = useState();
+  const { isAuthenticated, user, loading } = useSelector((state) => state.user);
+  const { cart } = useSelector((state) => state.cart);
+  const { wishlist } = useSelector((state) => state.wishlist);
+  const [searchTerm, setSearchTerm] = useState("");
+
   const [searchData, setSearchData] = useState(null);
-  const [active, setActive] = useState(null);
-  const [dropDown, setDropDown] = useState(null);
+  const [active, setActive] = useState(false);
+  const [dropDown, setDropDown] = useState(false);
   const [openCart, setOpenCart] = useState(false);
-  const [openWishList, setOpenWishList] = useState(false);
+  const [openWishlist, setOpenWishlist] = useState(false);
   const [open, setOpen] = useState(false);
 
   // console.log(user)
@@ -46,6 +49,34 @@ const Header = ({ activeHeading }) => {
       setActive(false);
     }
   });
+
+  // Update the profile image rendering in both mobile and desktop views
+  const renderProfileImage = () => {
+    if (loading) return null;
+    
+    if (isAuthenticated && user) {
+      return (
+        <Link to="/profile">
+          <img
+            src={user?.avatar?.url || "/default-avatar.png"}
+            alt="profile"
+            className="w-32 h-12 object-cover rounded-full border-[3px] border-[#0eae88]"
+          />
+        </Link>
+      );
+    }
+    
+    return (
+      <>
+        <Link to="/login" className="text-[18px] pr-[10px] text-[#000000b7]">
+         <FaUserCircle className="w-12 h-12 mt-4" color="#fff" />
+        </Link>
+        {/* <Link to="/sign-up" className="text-[18px] text-[#000000b7]">
+          Sign up
+        </Link> */}
+      </>
+    );
+  };
 
   return (
     <>
@@ -76,14 +107,13 @@ const Header = ({ activeHeading }) => {
               <div className="absolute min-h-[30vh] bg-slate-50 shadow-sm-2 z-[9] p-4">
                 {searchData &&
                   searchData.map((i, index) => {
-                    const d = i.name;
-
-                    const Product_name = d.replace(/\s+/g, "-");
+                  
                     return (
-                      <Link to={`/product/${Product_name}`}>
+                      <Link to={`/product/${i._id}`}>
                         <div className="w-full flex items-start-py-3">
                           <img
-                            src={i.image_Url[0].url}
+                            // src={i.image_Url[0].url}
+                            src={`${backend_url}${i.image_Url[0]?.url}`}
                             alt=""
                             className="w-[40px] h-[40px] mr-[10px]"
                           />
@@ -138,7 +168,7 @@ const Header = ({ activeHeading }) => {
             <div className="relative mr-[20px]">
               <AiOutlineShoppingCart size={30} />
               <span class="absolute right-0 top-0 rounded-full bg-[#3bc177] w-4 h-4 top right p-0 m-0 text-white font-mono text-[12px]  leading-tight text-center">
-                {/* {cart && cart.length} */} 1
+                {cart && cart.length} 
               </span>
             </div>
           </div>
@@ -155,12 +185,12 @@ const Header = ({ activeHeading }) => {
               <div>
                 <div
                   className="relative mr-[15px]"
-                  // onClick={() => setOpenWishlist(true) || setOpen(false)}
+                  onClick={() => setOpenWishlist(true) || setOpen(false)}
                 >
   
                   <AiOutlineHeart size={30} className="mt-5 ml-5" />
                   <span class="absolute right-0 top-0 rounded-full bg-[#3bc177] w-4 h-4 top right p-0 m-0 text-white font-mono text-[12px]  leading-tight text-center">
-                    {/* {wishlist && wishlist.length} */}1
+                    {wishlist && wishlist.length}1
                   </span>
                 </div> 
               </div>
@@ -181,11 +211,9 @@ const Header = ({ activeHeading }) => {
 {searchData && (
                   <div className="absolute bg-[#fff] z-10 shadow w-full left-0 p-3">
                     {searchData.map((i) => {
-                      const d = i.name;
-
-                      const Product_name = d.replace(/\s+/g, "-");
+                    
                       return (
-                        <Link to={`/product/${Product_name}`}>
+                        <Link to={`/product/${i._id}`}>
                           <div className="flex items-center">
                             <img
                               src={i.image_Url[0]?.url}
@@ -216,32 +244,7 @@ const Header = ({ activeHeading }) => {
               <br />
 
               <div className="flex w-full justify-center">
-                {isAuthenticated ? (
-                  <div>
-                    <Link to="/profile">
-                      <img
-                        src={`${user.avatar?.url}`}
-                        alt=""
-                        className="w-[60px] h-[60px] rounded-full border-[3px] border-[#0eae88]"
-                      />
-                    </Link>
-                  </div>
-                ) : (
-                  <>
-                    <Link
-                      to="/login"
-                      className="text-[18px] pr-[10px] text-[#000000b7]"
-                    >
-                      Login /
-                    </Link>
-                    <Link
-                      to="/sign-up"
-                      className="text-[18px] text-[#000000b7]"
-                    >
-                      Sign up
-                    </Link>
-                  </>
-                )}
+                {renderProfileImage()}
               </div>
             </div>
           </div>
@@ -288,11 +291,11 @@ const Header = ({ activeHeading }) => {
           <div className={`${styles.normalFlex}`}>
             <div
               className="relative cursor-pointer mr-[15px]"
-              onClick={() => setOpenWishList(true)}
+              onClick={() => setOpenWishlist(true)}
             >
               <AiOutlineHeart size={30} color="rgb(255 255 255 /83%)" />
               <span className="absolute right-0 top-0 rounded-full bg-[#3bc177] w-4 h-4 top right p-0 m-0 text-white font-mono text-[12px] leading-tight text-center">
-                0
+                {wishlist && wishlist.length ? wishlist.length : 0}
               </span>
             </div>
           </div>
@@ -304,25 +307,13 @@ const Header = ({ activeHeading }) => {
             >
               <AiOutlineShoppingCart size={30} color="rgb(255 255 255 /83%)" />
               <span className="absolute right-0 top-0 rounded-full bg-[#3bc177] w-4 h-4 top right p-0 m-0 text-white font-mono text-[12px] leading-tight text-center">
-                1
+                {cart && cart.length ? cart.length : 0}
               </span>
             </div>
 
             <div className={`${styles.normalFlex}`}>
               <div className="cursor-pointer relative mr-[15px]">
-                {isAuthenticated ? (
-                  <Link to="/profile">
-                    <img
-                      src={user.avatar.url}
-                      alt="profile"
-                      className="w-[110px] h-8 rounded-full"
-                    />
-                  </Link>
-                ) : (
-                  <Link to="/login">
-                    <CgProfile size={30} color="rgb(255 255 255 /83%)" />
-                  </Link>
-                )}
+                {renderProfileImage()}
               </div>
             </div>
 
@@ -332,8 +323,8 @@ const Header = ({ activeHeading }) => {
 
             {/* Wishlist Popup*/}
 
-            {openWishList ? (
-              <Wishlist setOpenWishList={setOpenWishList} />
+            {openWishlist ? (
+              <Wishlist setOpenWishlist={setOpenWishlist} />
             ) : null}
           </div>
         </div>

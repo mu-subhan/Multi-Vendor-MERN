@@ -1,117 +1,171 @@
 import React, { useState } from 'react'
-import {IoBagHandleOutline} from 'react-icons/io5'
+import { IoBagHandleOutline } from 'react-icons/io5'
 import { RxCross1 } from 'react-icons/rx'
-import {HiOutlineMinus, HiPlus, HiPlusSm} from 'react-icons/hi'
+import { HiOutlineMinus, HiPlus, HiPlusSm } from 'react-icons/hi'
 import styles from "../../styles/styles";
 import { Link } from 'react-router-dom';
+import { addToCart, removeFromCart } from "../../redux/actions/cart";
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
+import { backend_url } from '../../server';
 
 
+const Cart = ({ setOpenCart }) => {
+  const { cart } = useSelector((state) => state.cart);
+  const dispatch = useDispatch();
 
-const Cart = ({setOpenCart}) => {
-  const cartData =[
-    {
-        name:"Iphone 14 pro max 256 gb SSD and 8GB ram silver color",
-        description:"test",
-        price:999,
-    },
-    {
-        name:"Iphone 14 pro max 256 gb SSD and 8GB ram silver color",
-        description:"test",
-        price:999,
-    },{
-        name:"Iphone 14 pro max 256 gb SSD and 8GB ram silver color",
-        description:"test",
-        price:1099,
-    },{
-        name:"Iphone 14 pro max 256 gb SSD and 8GB ram silver color",
-        description:"test",
-        price:899,
-    },
-
-  ]
-   
-    return (
-    <div className='fixed top-0 left-0 w-full bg-[#0000004b] h-screen z-10'>
-     <div className='fixed top-0 right-0 min-h-full w-[25%] bg-white flex flex-col justify-between shadow-sm '>
-      <div>
-        <div className='flex w-full justify-end pt-5 pr-5'>
-          <RxCross1
-          size={25}
-          className='cursor-pointer'
-          onClick={() => setOpenCart(false)}
-          />
-          
-        </div>
-        {/* item length */}
-        <div className={`${styles.normalFlex} p-4`}>
-          <IoBagHandleOutline size={25} />
-          <h5 className='pl-2 text-[20px] font-[500]'>
-3 items
-          </h5>
-        </div>
-
-      {/* cart single item */}
-<br/>
-<div className='w-full border-t'>
-  {
-    cartData && cartData.map((i,index) =>
-      <CartSingle key={index} data={i}/>
-    )
+  const removeFromCartHandler = (data) => {
+    dispatch(removeFromCart(data)); // Pass the entire data object
+    toast.success("Item removed from cart");
   }
-</div>
 
+  const totalPrice = cart.reduce((acc, item) => acc + (item.discount_price * item.qty), 0);
 
+  const quantityChangeHandler = (data) => {
+    dispatch(addToCart(data));
+    toast.success("Cart updated successfully");
+  }
+
+  return (
+    <div className='fixed top-0 left-0 w-full bg-[#0000004b] h-screen z-10'>
+      <div className="fixed top-0 right-0 h-full w-[80%] 800px:w-[25%] bg-white flex flex-col overflow-y-scroll justify-between shadow-sm">
+        {cart && cart.length === 0 ? (
+          <div className="w-full h-screen flex items-center justify-center">
+            <div className="flex w-full justify-end pt-5 pr-5 fixed top-3 right-3">
+              <RxCross1
+                size={25}
+                className="cursor-pointer"
+                onClick={() => setOpenCart(false)}
+              />
+            </div>
+            <h5>Cart Items is empty!</h5>
+          </div>
+        ) : (
+          <>
+            <div>
+              <div className="flex w-full justify-end pt-5 pr-5">
+                <RxCross1
+                  size={25}
+                  className="cursor-pointer"
+                  onClick={() => setOpenCart(false)}
+                />
+              </div>
+              {/* Item length */}
+              <div className={`${styles.normalFlex} p-4`}>
+                <IoBagHandleOutline size={25} />
+                <h5 className="pl-2 text-[20px] font-[500]">
+                  {cart && cart.length} items
+                </h5>
+              </div>
+
+              {/* cart Single Items */}
+              <br />
+              <div className="w-full border-t">
+                {cart &&
+                  cart.map((i, index) => (
+                    <CartSingle
+                      key={index}
+                      data={i}
+                      quantityChangeHandler={quantityChangeHandler}
+                      removeFromCartHandler={removeFromCartHandler}
+                    />
+                  ))}
+              </div>
+            </div>
+
+            <div className="px-5 mb-3">
+              {/* checkout buttons */}
+              <Link to="/checkout">
+                <div
+                  className={`h-[45px] flex items-center justify-center w-[100%] bg-[#e44343] rounded-[5px]`}
+                >
+                  <h1 className="text-[#fff] text-[18px] font-[600]">
+                    Checkout Now (USD${totalPrice})
+                  </h1>
+                </div>
+              </Link>
+            </div>
+          </>
+        )}
       </div>
-      <div className='px-5 mb-3'>
-        {/* check button  */}
-        <Link to={"/checkout"}>
-        <div className={`h-[45px] flex items-center justify-center w-[100%] bg-[#e44343] rounded-[5px]`}>
-   <h1 className='text-white font-Roboto text-[18px] font-[600]'>CheckOut Now (USD$1080)</h1>
-        </div>
-        </Link>
-      </div>
-    </div> 
     </div>
   )
 }
 
-const CartSingle = ({ data }) => {
-  const [value, setValue] = useState(1);
-  const totalPrice = data.price * value;
+const CartSingle = ({ data, quantityChangeHandler, removeFromCartHandler }) => {
+  const [value, setValue] = useState(data.qty);
+  const totalPrice = data.discount_price * value;
+
+  console.log("check data", data)
+console.log("CartSingle data:", data);
+
+  const increment = (data) => {
+    setValue(value + 1);
+    if(data.qty === 0) {
+      setValue(1);
+    }
+    const updateCartData = {
+      ...data,
+      qty: value + 1
+    };
+    
+    // dispatch(addToCart(data));
+    toast.success("Item added to cart");
+  }
+  const decrement = (data) => {
+    if (value > 1) {
+      setValue(value - 1);
+      const updateCartData = {
+        ...data,
+        qty: value - 1
+      };
+      // dispatch(addToCart(data));
+      toast.success("Item removed from cart");
+    }
+  }
+
+
 
   return (
     <div className='border-b p-4'>
       <div className='w-full flex items-center'>
         <div>
-          <div 
+          <div
             className={`bg-[#e44343] border border-[#e4434373] rounded-full w-[25px] h-[25px] ${styles.normalFlex} justify-center cursor-pointer`}
-            onClick={() => setValue(value + 1)}
+            onClick={() => increment(data)}
           >
-            <HiPlus size={18} color='#fff'/>
+            <HiPlus size={18} color='#fff' />
           </div>
           <span className='pl-[10px]'>
+            {/* {data.qty} */}
             {value}
           </span>
-          <div 
+          <div
             className='bg-[#a7abb14f] rounded-full w-[25px] h-[25px] flex items-center justify-center cursor-pointer'
-            onClick={() => setValue(value === 1 ? 1 : value - 1)}
+            onClick={() => decrement(data)}
           >
-            <HiOutlineMinus size={16} color='#7d879c'/>
+            <HiOutlineMinus size={16} color='#7d879c' />
           </div>
         </div>
-        <img 
-          src='https://outfitters.com.pk/cdn/shop/files/F0124102901_2.jpg?v=1731385277&width=533' 
-          alt='' 
-          className='w-[80px] h-[80px] ml-2 object-cover'
+        <img
+          src={
+            data?.images && data.images[0]
+              ? `${backend_url}uploads/${data.images[0]}`
+              : "https://outfitters.com.pk/cdn/shop/files/F0124102901_2.jpg?v=1731385277&width=533"
+          }
+          alt="no image is displayed"
+          className="w-[130px] h-min ml-2 mr-2 rounded-[5px] object-cover"
         />
         <div className='pl-[5px]'>
-          <h1>{data.name}</h1>
+          <h1 className='font-[500] text-[14px] pt-[4px]  font-Roboto text-justify'>{data.name}</h1>
           <h4 className='font-[400] text-[15px] text-[#00000082]'>
-            ${data.price} * {value}
-          </h4 >
-          <h4 className="font-[500] text-[17px] pt-[4px] text-[#d02222] font-Roboto">US$ {totalPrice}</h4>
+            ${data.discount_price || 0} * {value}
+          </h4>
+          <h4 className="font-[500] text-[17px] pt-[4px] text-[#d02222] font-Roboto">
+            US$ {totalPrice}
+          </h4>
         </div>
-        <RxCross1 className='cursor-pointer'/>
+        <RxCross1 className='cursor-pointer w-12 h-12 relative top-8 right-0' onClick={() => removeFromCartHandler(data)} />
       </div>
     </div>
   );

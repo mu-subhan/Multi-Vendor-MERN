@@ -1,6 +1,25 @@
 import axios from "axios"
 import { server } from "../../server"
 
+// get all products
+export const getAllProducts = () => async (dispatch) => {
+  try {
+    dispatch({
+      type: "getAllProductsRequest",
+    });
+
+    const { data } = await axios.get(`${server}/product/get-all-products`);
+    dispatch({
+      type: "getAllProductsSuccess",
+      payload: data.products,
+    });
+  } catch (error) {
+    dispatch({
+      type: "getAllProductsFailed",
+      payload: error.response?.data?.message,
+    });
+  }
+};
 
 // create product 
 export const createProduct = (newForm) => async (dispatch) =>{
@@ -8,7 +27,10 @@ export const createProduct = (newForm) => async (dispatch) =>{
         dispatch({
             type:"productCreateRequest",
         })
-        const config = {headers:{"Content-Type":"multipart/form-data"}}
+        const config = {
+            headers: {"Content-Type":"multipart/form-data"},
+            withCredentials: true
+        }
         const {data}= await axios.post(`${server}/product/create-product`,
             newForm,
             config
@@ -20,12 +42,12 @@ export const createProduct = (newForm) => async (dispatch) =>{
     } catch (error) {
         dispatch({
         type:"productCreateFail",
-        payload: error.response.data.message,
+        payload: error.response?.data?.message || "Failed to create product",
    })
     }
 };
 
-// get all products
+// get all products of shop
 export const getAllProductsShop = (id) => async (dispatch) =>{
     try {
         dispatch({
@@ -34,7 +56,6 @@ export const getAllProductsShop = (id) => async (dispatch) =>{
 
         console.log("Making API call to fetch products for shop:", id);
         const {data} = await axios.get(`${server}/product/get-all-products-shop/${id}`)
-        // console.log("API Response:", data);
 
         if (data.success) {
             dispatch({

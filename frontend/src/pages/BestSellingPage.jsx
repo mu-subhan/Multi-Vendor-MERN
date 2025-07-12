@@ -4,6 +4,7 @@ import { productData } from '../static/data';
 import Header from '../components/Layout/Header';
 import styles from '../styles/styles';
 import ProductCard from '../components/Route/ProductCard/ProductCard';
+import Footer from '../components/Layout/Footer';
 
 const BestSellingPage = () => {
 
@@ -32,6 +33,7 @@ setData(d);
 
         </div>
     </div>
+    <Footer />
     </div>
   )
 }

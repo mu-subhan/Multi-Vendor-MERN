@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import {
   LoginPage,
@@ -20,23 +20,53 @@ import {
 } from "./routes/Routes.js";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
 import Store from "./redux/store.js";
 import { loadSeller, loadUser } from "./redux/actions/user";
+import { getAllProducts } from "./redux/actions/product";
+import { getAllEvents } from "./redux/actions/event";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import SellerProtectedRoute from "./routes/SellerProtectedRoute";
 import {ShopHomePage} from "./ShopRoutes"
 import {ShopDashboardPage,ShopCreateProduct,ShopAllProducts,ShopCreateEvent,ShopAllEvent,ShopAllCoupouns} from "./routes/ShopRoutes"
+import axios from "axios";
+import { server } from "./server.js";
 
 function App() {
+  const [stripeApikey,setStripeApiKey] = useState("");
+
+  async function getStripeApiKey() {
+    const {data} = await axios.get(`${server}/payment/stripeapikey`);
+    setStripeApiKey(data.stripeApikey)
+    
+  }
    
   useEffect(() => {
     Store.dispatch(loadUser());
     Store.dispatch(loadSeller());
+    Store.dispatch(getAllProducts());
+    Store.dispatch(getAllEvents());
+    getStripeApiKey();
   }, []);
-
+ 
   return (
    
         <BrowserRouter>
+         {stripeApikey && (
+        <Elements stripe={loadStripe(stripeApikey)}>
+          <Routes>
+            <Route
+              path="/payment"
+              element={
+                <ProtectedRoute>
+                  <PaymentPage />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </Elements>
+      )}
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
@@ -50,7 +80,7 @@ function App() {
               element={<SellerActivationPage />}
             />
             <Route path="/products" element={<ProductPage />} />
-            <Route path="product/:name" element ={<ProductDetailsPage/>}/>
+            <Route path="product/:id" element ={<ProductDetailsPage/>}/>
             <Route path="/best-selling" element={<BestSellingPage />} />
             <Route path="/events" element={<EventPage />} />
             <Route path="/faq" element={<FAQPage />} />
@@ -59,8 +89,7 @@ function App() {
                 <CheckoutPage />
               </ProtectedRoute>
               } />
-            <Route path="/payment" element={<PaymentPage />} />
-            <Route path="/order/success/:id" element={<OrderSuccessPage/>}/>
+            <Route path="/order/success/" element={<OrderSuccessPage/>}/>
             <Route path="/profile" element={
               <ProtectedRoute >
                 <ProfilePage/>
