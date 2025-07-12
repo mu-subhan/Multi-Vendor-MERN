@@ -69,9 +69,14 @@ router.get("/get-all-products", catchAsyncError(async (req, res, next) => {
         // Add full URLs to images
         const productsWithUrls = products.map(product => {
             const productObj = product.toObject();
-            productObj.images = productObj.images.map(img => ({
-                url: img.url || `${process.env.BACKEND_URL}/uploads/${img}`
-            }));
+            productObj.images = productObj.images.map(img => {
+                // If the image is already a full URL, return as is
+                if (typeof img === 'string' && img.startsWith('http')) {
+                    return img;
+                }
+                // Otherwise, construct the full URL
+                return `${process.env.BACKEND_URL || 'http://localhost:8000'}/uploads/${img}`;
+            });
             return productObj;
         });
         
@@ -80,7 +85,7 @@ router.get("/get-all-products", catchAsyncError(async (req, res, next) => {
             products: productsWithUrls,
         });
     } catch (error) {
-        return next(new ErrorHandler(error, 400));
+        return next(new ErrorHandler(error.message, 400));
     }
 }));
 
