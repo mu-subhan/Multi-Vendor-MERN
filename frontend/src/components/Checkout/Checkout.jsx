@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import styles from "../../styles/styles";
 import { Country, State } from "country-state-city";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { useEffect } from "react";
 import axios from "axios";
 import { server } from "../../server";
 import { toast } from "react-toastify";
 
 const Checkout = () => {
   const { user } = useSelector((state) => state.user);
-  const cart = useSelector((state) => state.cart?.cart || []); // Safe access
+  const { cart } = useSelector((state) => state.cart);
   const [country, setCountry] = useState("");
   const [city, setCity] = useState("");
   const [userInfo, setUserInfo] = useState(false);
@@ -26,31 +27,31 @@ const Checkout = () => {
   }, []);
 
   const paymentSubmit = () => {
-    if (address1 === "" || address2 === "" || zipCode === null || country === "" || city === "") {
-      toast.error("Please choose your delivery address!");
-    } else {
-      const shippingAddress = {
-        address1,
-        address2,
-        zipCode,
-        country,
-        city,
-      };
+   if(address1 === "" || address2 === "" || zipCode === null || country === "" || city === ""){
+      toast.error("Please choose your delivery address!")
+   } else{
+    const shippingAddress = {
+      address1,
+      address2,
+      zipCode,
+      country,
+      city,
+    };
 
-      const orderData = {
-        cart,
-        totalPrice,
-        subTotalPrice,
-        shipping,
-        discountPrice,
-        shippingAddress,
-        user,
-      };
-
-      // update local storage with the updated orders array
-      localStorage.setItem("latestOrder", JSON.stringify(orderData));
-      navigate("/payment");
+    const orderData = {
+      cart,
+      totalPrice,
+      subTotalPrice,
+      shipping,
+      discountPrice,
+      shippingAddress,
+      user,
     }
+
+    // update local storage with the updated orders array
+    localStorage.setItem("latestOrder", JSON.stringify(orderData));
+    navigate("/payment");
+   }
   };
 
   const subTotalPrice = cart.reduce(
@@ -58,7 +59,7 @@ const Checkout = () => {
     0
   );
 
-  // shipping cost calculation
+  // this is shipping cost variable
   const shipping = subTotalPrice * 0.1;
 
   const handleSubmit = async (e) => {
@@ -69,7 +70,8 @@ const Checkout = () => {
       const shopId = res.data.couponCode?.shopId;
       const couponCodeValue = res.data.couponCode?.value;
       if (res.data.couponCode !== null) {
-        const isCouponValid = cart.filter((item) => item.shopId === shopId);
+        const isCouponValid =
+          cart && cart.filter((item) => item.shopId === shopId);
 
         if (isCouponValid.length === 0) {
           toast.error("Coupon code is not valid for this shop");
@@ -86,7 +88,7 @@ const Checkout = () => {
         }
       }
       if (res.data.couponCode === null) {
-        toast.error("Coupon code doesn't exist!");
+        toast.error("Coupon code doesn't exists!");
         setCouponCode("");
       }
     });
@@ -97,6 +99,8 @@ const Checkout = () => {
   const totalPrice = couponCodeData
     ? (subTotalPrice + shipping - discountPercentenge).toFixed(2)
     : (subTotalPrice + shipping).toFixed(2);
+
+  console.log(discountPercentenge);
 
   return (
     <div className="w-full flex flex-col items-center py-8">
@@ -140,7 +144,6 @@ const Checkout = () => {
   );
 };
 
-// ShippingInfo and CartData components remain unchanged
 const ShippingInfo = ({
   user,
   country,
@@ -348,4 +351,5 @@ const CartData = ({
     </div>
   );
 };
+
 export default Checkout;

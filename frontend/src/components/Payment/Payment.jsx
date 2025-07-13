@@ -29,7 +29,7 @@ const Payment = () => {
     setOrderData(orderData);
   }, []);
 
-  const createOrder = (data, actions) => {
+  const createOrder = (data,actions) => {
     return actions.order
       .create({
         purchase_units: [
@@ -130,7 +130,7 @@ const Payment = () => {
           order.paymnentInfo = {
             id: result.paymentIntent.id,
             status: result.paymentIntent.status,
-            type: "Credit Card",
+            type: "Credit Card", 
           };
 
           await axios
