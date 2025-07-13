@@ -36,6 +36,7 @@
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.0.2",
     "react-toastify": "^10.0.6",
-    "stable": "^0.1.8"
+    "stable": "^0.1.8",
+    "stripe": "^18.3.0"
   }
 }
