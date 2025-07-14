@@ -57,11 +57,14 @@ const Header = ({ activeHeading }) => {
     if (isAuthenticated && user) {
       return (
         <Link to="/profile">
-          <img
-            src={user?.avatar?.url || "/default-avatar.png"}
-            alt="profile"
-            className="w-32 h-12 object-cover rounded-full border-[3px] border-[#0eae88]"
-          />
+          <div className="w-8 h-9 rounded-full border-[3px] border-[#0eae88] overflow-hidden">
+  <img
+    src={user?.avatar?.url || "/default-avatar.png"}
+    alt="profile"
+    className="w-full h-full object-cover"
+  />
+</div>
+
         </Link>
       );
     }
