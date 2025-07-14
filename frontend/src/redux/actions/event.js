@@ -56,14 +56,20 @@ export const getAllEvents = () => async (dispatch) => {
     });
 
     const { data } = await axios.get(`${server}/event/get-all-events`);
-    dispatch({
-      type: "getAlleventsSuccess",
-      payload: data.events,
-    });
+    
+    if (data.success) {
+      dispatch({
+        type: "getAlleventsSuccess",
+        payload: data.events,
+      });
+    } else {
+      throw new Error(data.message || "Failed to fetch events");
+    }
   } catch (error) {
+    console.error("Error fetching events:", error);
     dispatch({
       type: "getAlleventsFailed",
-      payload: error.response.data.message,
+      payload: error.response?.data?.message || "Failed to fetch events",
     });
   }
 };
