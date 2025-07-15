@@ -16,7 +16,8 @@ import {
   ProfilePage,
   ShopCreatePage,
   SellerActivationPage,
-  ShopLoginPage
+  ShopLoginPage,
+  OrderDetailsPage
 } from "./routes/Routes.js";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -29,7 +30,7 @@ import { getAllEvents } from "./redux/actions/event";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import SellerProtectedRoute from "./routes/SellerProtectedRoute";
 import {ShopHomePage} from "./ShopRoutes"
-import {ShopDashboardPage,ShopCreateProduct,ShopAllProducts,ShopCreateEvent,ShopAllEvent,ShopAllCoupouns} from "./routes/ShopRoutes"
+import {ShopDashboardPage,ShopCreateProduct,ShopAllProducts,ShopCreateEvent,ShopAllEvent,ShopAllCoupouns,ShopAllOrders,ShopOrderDetails} from "./routes/ShopRoutes"
 import axios from "axios";
 import { server } from "./server.js";
 
@@ -122,6 +123,33 @@ function App() {
           element={
             <SellerProtectedRoute>
               <ShopCreateProduct/>
+            </SellerProtectedRoute>
+          }
+        />
+
+         <Route
+          path="/dashboard-orders"
+          element={
+            <SellerProtectedRoute>
+              <ShopAllOrders/>
+            </SellerProtectedRoute>
+          }
+        />
+   
+ <Route
+          path="/order/:id"
+          element={
+            <SellerProtectedRoute>
+              <ShopOrderDetails />
+            </SellerProtectedRoute>
+          }
+        />
+
+         <Route
+          path="/user/order/:id"
+          element={
+            <SellerProtectedRoute>
+              <OrderDetailsPage />
             </SellerProtectedRoute>
           }
         />

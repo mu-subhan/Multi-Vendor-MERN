@@ -15,6 +15,7 @@ import {toast} from "react-toastify";
 import { useDispatch } from "react-redux";
 import axios from "axios";
 import { RxCross1 } from "react-icons/rx";
+import { getAllOrdersOfUser } from "../../redux/actions/order";
 
 const ProfileContent = ({ active }) => {
 
@@ -248,20 +249,13 @@ const ProfileContent = ({ active }) => {
 };
 
 const AllOrders = () => {
-  const orders = [
-    {
-      _id: "7463hvbfbhfbrtr28820221",
-      orderItems: [{ name: "Iphone 14 pro max" }],
-      totalPrice: 120,
-      orderStatus: "Processing",
-    },
-    {
-      _id: "6348hvbfbhfbrtr12345021",
-      orderItems: [{ name: "Samsung Galaxy" }],
-      totalPrice: 150,
-      orderStatus: "Delivered",
-    },
-  ];
+  const {user} = useSelector((state)=>state.user);
+  const {orders} = useSelector((state)=>state.order);
+ const dispatch = useDispatch();
+
+ useEffect(()=>{
+  dispatch(getAllOrdersOfUser(user._id));
+ },[])
 
   const columns = [
     {
@@ -300,7 +294,7 @@ const AllOrders = () => {
       minWidth: 150,
       sortable: false,
       renderCell: (params) => (
-        <Link to={`/order/${params.id}`}>
+        <Link to={`/user/order/${params.id}`}>
           <Button>
             <AiOutlineArrowRight size={20} />
           </Button>
@@ -311,9 +305,9 @@ const AllOrders = () => {
 
   const rows = orders.map((item) => ({
     id: item._id,
-    itemsQty: item.orderItems ? item.orderItems.length : 0,
+    itemsQty: item.cart ? item.cart.length : 0,
     total: "US$ " + item.totalPrice,
-    status: item.orderStatus,
+    status: item.status,
   }));
 
   return (
