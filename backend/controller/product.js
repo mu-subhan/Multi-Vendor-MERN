@@ -208,6 +208,70 @@ router.put(
   })
 );
 
+// create product review
+router.post(
+  "/create-review",
+  isAuthentication,
+  catchAsyncError(async (req, res, next) => {
+    try {
+      const { user, rating, comment, productId, orderId } = req.body;
+
+      // Validate required fields
+      if (!rating || !comment || !productId) {
+        return next(new ErrorHandler("Please provide all required fields", 400));
+      }
+
+      const product = await Product.findById(productId);
+
+      if (!product) {
+        return next(new ErrorHandler("Product not found", 404));
+      }
+
+      // Check if user has already reviewed
+      const isReviewed = product.reviews.find(
+        (rev) => rev.user._id.toString() === user._id.toString()
+      );
+
+      if (isReviewed) {
+        // Update existing review
+        product.reviews.forEach((rev) => {
+          if (rev.user._id.toString() === user._id.toString()) {
+            rev.rating = rating;
+            rev.comment = comment;
+            rev.createdAt = Date.now();
+          }
+        });
+      } else {
+        // Add new review
+        product.reviews.push({
+          user,
+          rating,
+          comment,
+          productId,
+          createdAt: Date.now(),
+        });
+      }
+
+      // Calculate average rating
+      let avg = 0;
+      product.reviews.forEach((rev) => {
+        avg += rev.rating;
+      });
+
+      product.ratings = avg / product.reviews.length;
+
+      await product.save({ validateBeforeSave: false });
+
+      res.status(200).json({
+        success: true,
+        message: "Review added successfully!",
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
+);
+
 // all products --- for admin
 // router.get(
 //   "/admin-all-products",
