@@ -9,6 +9,7 @@ import { addToCart } from "../../../redux/actions/cart";
 import { toast } from "react-toastify";
 import Ratings from "../../Products/Ratings";
 import { useEffect } from "react";
+import { backend_url } from "../../../server";
 
 const ProductCard = ({ data }) => {
   const { wishlist } = useSelector((state) => state.wishlist);
@@ -61,7 +62,7 @@ const ProductCard = ({ data }) => {
     }
     
     // If it's just a filename from the backend
-    return `${process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000'}/uploads/${image}`;
+    return `${backend_url}/uploads/${image}`;
   };
 
   return (
@@ -73,6 +74,10 @@ const ProductCard = ({ data }) => {
             src={getImageUrl(data.images && data.images[0])}
             alt={data.name}
             className="w-full h-[170px] object-contain"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = "/no-image.png";
+            }}
           />
         </Link>
         <Link to={`/product/${data._id}`}>

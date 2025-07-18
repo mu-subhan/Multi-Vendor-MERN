@@ -27,6 +27,11 @@ const UserOrderDetails = () => {
 
   const data = orders && orders.find((item) => item._id === id);
 
+  const getImageUrl = (image) => {
+    if (!image?.url) return "/no-image.png";
+    return image.url.startsWith("http") ? image.url : `${backend_url}/uploads/${image.url}`;
+  };
+
   const reviewHandler = async (e) => {
     await axios
       .put(
@@ -36,7 +41,6 @@ const UserOrderDetails = () => {
           rating,
           comment,
           productId: selectedItem?._id,
-        //   orderId: id,
         },
         { withCredentials: true }
       )
@@ -48,7 +52,7 @@ const UserOrderDetails = () => {
         setOpen(false);
       })
       .catch((error) => {
-        toast.error(error);
+        toast.error(error.response?.data?.message || "Error submitting review");
       });
   };
   
@@ -57,9 +61,9 @@ const UserOrderDetails = () => {
       status: "Processing refund"
     }).then((res) => {
        toast.success(res.data.message);
-    dispatch(getAllOrdersOfUser(user._id));
+       dispatch(getAllOrdersOfUser(user._id));
     }).catch((error) => {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Error processing refund");
     })
   };
 
@@ -85,13 +89,12 @@ const UserOrderDetails = () => {
       <br />
       <br />
       {data &&
-        data?.cart.map((item, index) => {
-          return(
-          <div className="w-full flex items-start mb-5">
+        data?.cart.map((item, index) => (
+          <div className="w-full flex items-start mb-5" key={`${item._id}-${index}`}>
             <img
-              src={`${item.images[0]?.url}`}
-              alt=""
-              className="w-[80x] h-[80px]"
+              src={getImageUrl(item.images[0])}
+              alt={item.name}
+              className="w-[80px] h-[80px] object-cover"
             />
             <div className="w-full">
               <h5 className="pl-3 text-[20px]">{item.name}</h5>
@@ -99,17 +102,19 @@ const UserOrderDetails = () => {
                 US${item.discountPrice} x {item.qty}
               </h5>
             </div>
-            {!item.isReviewed && data?.status === "Delivered" ?  <div
-                className={`${styles.button} text-[#fff]`}
-                onClick={() => setOpen(true) || setSelectedItem(item)}
+            {!item.isReviewed && data?.status === "Delivered" && (
+              <div
+                className={`${styles.button} text-[#fff] cursor-pointer`}
+                onClick={() => {
+                  setSelectedItem(item);
+                  setOpen(true);
+                }}
               >
                 Write a review
-              </div> : (
-             null
+              </div>
             )}
           </div>
-          )
-         })}
+        ))}
 
       {/* review popup */}
       {open && (
@@ -127,17 +132,11 @@ const UserOrderDetails = () => {
             </h2>
             <br />
             <div className="w-full flex">
-<img
-  src={
-    selectedItem?.images && selectedItem.images[0]?.url
-      ? selectedItem.images[0].url.startsWith("http")
-        ? selectedItem.images[0].url
-        : `${backend_url}/uploads/${selectedItem.images[0].url}`
-      : "/no-image.png"
-  }
-  alt=""
-  className="w-[80px] h-[80px]"
-/>
+              <img
+                src={getImageUrl(selectedItem?.images[0])}
+                alt={selectedItem?.name}
+                className="w-[80px] h-[80px] object-cover"
+              />
               <div>
                 <div className="pl-3 text-[20px]">{selectedItem?.name}</div>
                 <h4 className="pl-3 text-[20px]">
@@ -154,25 +153,23 @@ const UserOrderDetails = () => {
               Give a Rating <span className="text-red-500">*</span>
             </h5>
             <div className="flex w-full ml-2 pt-1">
-              {[1, 2, 3, 4, 5].map((i) =>
-                rating >= i ? (
-                  <AiFillStar
-                    key={i}
-                    className="mr-1 cursor-pointer"
-                    color="rgb(246,186,0)"
-                    size={25}
-                    onClick={() => setRating(i)}
-                  />
-                ) : (
-                  <AiOutlineStar
-                    key={i}
-                    className="mr-1 cursor-pointer"
-                    color="rgb(246,186,0)"
-                    size={25}
-                    onClick={() => setRating(i)}
-                  />
-                )
-              )}
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} onClick={() => setRating(i)}>
+                  {rating >= i ? (
+                    <AiFillStar
+                      className="mr-1 cursor-pointer"
+                      color="rgb(246,186,0)"
+                      size={25}
+                    />
+                  ) : (
+                    <AiOutlineStar
+                      className="mr-1 cursor-pointer"
+                      color="rgb(246,186,0)"
+                      size={25}
+                    />
+                  )}
+                </div>
+              ))}
             </div>
             <br />
             <div className="w-full ml-3">
@@ -193,14 +190,14 @@ const UserOrderDetails = () => {
                 className="mt-2 w-[95%] border p-2 outline-none"
               ></textarea>
             </div>
-           <button
-  className={`${styles.button} text-white text-[20px] ml-3`}
-  type="button"
-  disabled={rating < 2}
-  onClick={reviewHandler}
->
-  Submit
-</button>
+            <button
+              className={`${styles.button} text-white text-[20px] ml-3`}
+              type="button"
+              disabled={rating < 1}
+              onClick={reviewHandler}
+            >
+              Submit
+            </button>
           </div>
         </div>
       )}
@@ -231,13 +228,14 @@ const UserOrderDetails = () => {
             {data?.paymentInfo?.status ? data?.paymentInfo?.status : "Not Paid"}
           </h4>
           <br />
-           {
-            data?.status === "Delivered" && (
-              <div className={`${styles.button} text-white`}
-              onClick={refundHandler}
-              >Give a Refund</div>
-            )
-           }
+           {data?.status === "Delivered" && (
+              <div 
+                className={`${styles.button} text-white cursor-pointer`}
+                onClick={refundHandler}
+              >
+                Give a Refund
+              </div>
+            )}
         </div>
       </div>
       <br />

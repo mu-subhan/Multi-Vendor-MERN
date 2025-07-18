@@ -22,6 +22,19 @@ const Wishlist = ({ setOpenWishlist }) => {
     setOpenWishlist(false);
   }
 
+  // Function to get the proper image URL
+  const getImageUrl = (image) => {
+    if (!image) return "/no-image.png";
+    
+    // If the image is already a full URL
+    if (typeof image === 'string' && image.startsWith('http')) {
+      return image;
+    }
+    
+    // If it's just a filename from the backend
+    return `${backend_url}/uploads/${image}`;
+  };
+
   return (
     <div className="fixed top-0 left-0 w-full bg-[#0000004b] h-screen z-10">
       <div className="fixed top-0 right-0 h-full w-[80%] overflow-y-scroll 800px:w-[25%] bg-white flex flex-col justify-between shadow-sm">
@@ -77,13 +90,18 @@ const CartSingle = ({ data,removeFromWishlistHandler,addToCartHandler }) => {
   return (
     <div className="border-b p-4">
       <div className="w-full 800px:flex items-center">
-        <RxCross1 className="cursor-pointer 800px:mb-['unset'] 800px:ml-['unset'] mb-2 ml-2"
-        onClick={() => removeFromWishlistHandler(data)}
+        <RxCross1 
+          className="cursor-pointer 800px:mb-['unset'] 800px:ml-['unset'] mb-2 ml-2"
+          onClick={() => removeFromWishlistHandler(data)}
         />
         <img
-          src={`${backend_url || ""}/uploads/${data?.images[0]?.url}`}
-          alt=""
-          className="w-[130px] h-min ml-2 mr-2 rounded-[5px]"
+          src={getImageUrl(data?.images && data.images[0])}
+          alt={data.name}
+          className="w-[130px] h-min ml-2 mr-2 rounded-[5px] object-cover"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = "/no-image.png";
+          }}
         />
 
         <div className="pl-[5px]">
@@ -93,8 +111,11 @@ const CartSingle = ({ data,removeFromWishlistHandler,addToCartHandler }) => {
           </h4>
         </div>
         <div>
-          <BsCartPlus size={20} className="cursor-pointer" tile="Add to cart"
-           onClick={() => addToCartHandler(data)}
+          <BsCartPlus 
+            size={20} 
+            className="cursor-pointer" 
+            title="Add to cart"
+            onClick={() => addToCartHandler(data)}
           />
         </div>
       </div>

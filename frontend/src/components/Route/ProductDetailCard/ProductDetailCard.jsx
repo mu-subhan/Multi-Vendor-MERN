@@ -15,6 +15,7 @@ import {
   addToWishlist,
   removeFromWishlist,
 } from "../../../redux/actions/wishlist";
+import { backend_url } from "../../../server";
 
 const ProductDetailsCard = ({ setOpen, data }) => {
   const { cart } = useSelector((state) => state.cart);
@@ -22,7 +23,6 @@ const ProductDetailsCard = ({ setOpen, data }) => {
   const dispatch = useDispatch();
   const [count, setCount] = useState(1);
   const [click, setClick] = useState(false);
-  //   const [select, setSelect] = useState(false);
 
   const handleMessageSubmit = () => {};
 
@@ -69,6 +69,19 @@ const ProductDetailsCard = ({ setOpen, data }) => {
     dispatch(addToWishlist(data));
   };
 
+  // Function to get the proper image URL
+  const getImageUrl = (image) => {
+    if (!image) return "/no-image.png";
+    
+    // If the image is already a full URL
+    if (typeof image === 'string' && image.startsWith('http')) {
+      return image;
+    }
+    
+    // If it's just a filename from the backend
+    return `${backend_url}/uploads/${image}`;
+  };
+
   return (
     <div className="bg-[#fff]">
       {data ? (
@@ -82,13 +95,25 @@ const ProductDetailsCard = ({ setOpen, data }) => {
 
             <div className="block w-full 800px:flex">
               <div className="w-full 800px:w-[50%]">
-                <img src={`${data.images && data.images[0]?.url}`} alt="" />
+                <img 
+                  src={getImageUrl(data.images && data.images[0])} 
+                  alt={data.name}
+                  className="w-full h-[350px] object-contain"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = "/no-image.png";
+                  }}
+                />
                 <div className="flex">
                   <Link to={`/shop/preview/${data.shop._id}`} className="flex">
                     <img
-                      src={`${data.images && data.images[0]?.url}`}
-                      alt=""
+                      src={getImageUrl(data.shop?.avatar)}
+                      alt={data.shop?.name}
                       className="w-[50px] h-[50px] rounded-full mr-2"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "/default-avatar.png";
+                      }}
                     />
                     <div>
                       <h3 className={`${styles.shop_name}`}>
@@ -106,7 +131,7 @@ const ProductDetailsCard = ({ setOpen, data }) => {
                     Send Message <AiOutlineMessage className="ml-1" />
                   </span>
                 </div>
-                <h5 className="text-[16px] text-[red] mt-5">(50) Sold out</h5>
+                <h5 className="text-[16px] text-[red] mt-5">{data?.sold_out || 0} Sold out</h5>
               </div>
 
               <div className="w-full 800px:w-[50%] pt-5 pl-[5px] pr-[5px]">

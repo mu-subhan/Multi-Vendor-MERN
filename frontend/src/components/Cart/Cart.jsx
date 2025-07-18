@@ -26,6 +26,19 @@ const Cart = ({ setOpenCart }) => {
     toast.success("Cart updated successfully");
   }
 
+  // Function to get the proper image URL
+  const getImageUrl = (image) => {
+    if (!image) return "/no-image.png";
+    
+    // If the image is already a full URL
+    if (typeof image === 'string' && image.startsWith('http')) {
+      return image;
+    }
+    
+    // If it's just a filename from the backend
+    return `${backend_url}/uploads/${image}`;
+  };
+
   return (
     <div className='fixed top-0 left-0 w-full bg-[#0000004b] h-screen z-10'>
       <div className="fixed top-0 right-0 h-full w-[80%] 800px:w-[25%] bg-white flex flex-col overflow-y-scroll justify-between shadow-sm">
@@ -148,16 +161,16 @@ console.log("CartSingle data:", data);
           </div>
         </div>
         <img
-          src={
-            data?.images && data.images[0]
-              ? `${backend_url}uploads/${data.images[0]}`
-              : "https://outfitters.com.pk/cdn/shop/files/F0124102901_2.jpg?v=1731385277&width=533"
-          }
-          alt="no image is displayed"
+          src={getImageUrl(data?.images && data.images[0])}
+          alt={data.name}
           className="w-[130px] h-min ml-2 mr-2 rounded-[5px] object-cover"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = "/no-image.png";
+          }}
         />
         <div className='pl-[5px]'>
-          <h1 className='font-[500] text-[14px] pt-[4px]  font-Roboto text-justify'>{data.name}</h1>
+          <h1 className='font-[500] text-[14px] pt-[4px] font-Roboto text-justify'>{data.name}</h1>
           <h4 className='font-[400] text-[15px] text-[#00000082]'>
             ${data.discount_price || 0} * {value}
           </h4>
@@ -165,7 +178,10 @@ console.log("CartSingle data:", data);
             US$ {totalPrice}
           </h4>
         </div>
-        <RxCross1 className='cursor-pointer w-12 h-12 relative top-8 right-0' onClick={() => removeFromCartHandler(data)} />
+        <RxCross1 
+          className='cursor-pointer w-12 h-12 relative top-8 right-0' 
+          onClick={() => removeFromCartHandler(data)} 
+        />
       </div>
     </div>
   );

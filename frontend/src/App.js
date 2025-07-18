@@ -17,7 +17,8 @@ import {
   ShopCreatePage,
   SellerActivationPage,
   ShopLoginPage,
-  OrderDetailsPage
+  OrderDetailsPage,
+  TrackOrderPage,
 } from "./routes/Routes.js";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -150,6 +151,15 @@ function App() {
           element={
             <SellerProtectedRoute>
               <OrderDetailsPage />
+            </SellerProtectedRoute>
+          }
+        />
+
+                 <Route
+          path="/user/track/order/:id"
+          element={
+            <SellerProtectedRoute>
+              <TrackOrderPage />
             </SellerProtectedRoute>
           }
         />
