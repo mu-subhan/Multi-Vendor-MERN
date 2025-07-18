@@ -31,7 +31,7 @@ import { getAllEvents } from "./redux/actions/event";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import SellerProtectedRoute from "./routes/SellerProtectedRoute";
 import {ShopHomePage} from "./ShopRoutes"
-import {ShopDashboardPage,ShopCreateProduct,ShopAllProducts,ShopCreateEvent,ShopAllEvent,ShopAllCoupouns,ShopAllOrders,ShopOrderDetails} from "./routes/ShopRoutes"
+import {ShopDashboardPage,ShopCreateProduct,ShopAllProducts,ShopCreateEvent,ShopAllEvent,ShopAllCoupouns,ShopAllOrders,ShopOrderDetails,ShopAllRefunds,ShopSettingPage} from "./routes/ShopRoutes"
 import axios from "axios";
 import { server } from "./server.js";
 
@@ -109,6 +109,14 @@ function App() {
             </SellerProtectedRoute>
           }
         />
+          <Route
+          path="/settings"
+          element={
+            <SellerProtectedRoute>
+              <ShopSettingPage />
+            </SellerProtectedRoute>
+          }
+        />
 
          <Route
           path="/dashboard"
@@ -169,6 +177,16 @@ function App() {
           element={
             <SellerProtectedRoute>
               <ShopAllProducts/>
+            </SellerProtectedRoute>
+          }
+        />
+
+
+         <Route
+          path="/dashboard-refunds"
+          element={
+            <SellerProtectedRoute>
+              <ShopAllRefunds/>
             </SellerProtectedRoute>
           }
         />

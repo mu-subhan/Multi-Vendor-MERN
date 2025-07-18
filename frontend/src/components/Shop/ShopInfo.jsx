@@ -4,6 +4,7 @@ import { backend_url } from '../../server';
 import styles from '../../styles/styles';
 import axios from 'axios';
 import { server } from '../../server';
+import { Link } from 'react-router-dom';
 
 const ShopInfo = ({isOwner}) => {
 
@@ -73,12 +74,14 @@ const ShopInfo = ({isOwner}) => {
             {
                 isOwner && (
                     <div className="py-3 px-4">
+                        <Link to="/settings">
                         <div className={`${styles.button} !w-full !h-[42px] !rounded-[5px]`}>
                             <span className='text-white'>
 Edit Shop
                             </span>
  
                         </div>
+                        </Link>
                          <div className={`${styles.button} !w-full !h-[42px] !rounded-[5px]`}
                          onClick={logoutHandler}>
                             <span className='text-white'>Log Out
