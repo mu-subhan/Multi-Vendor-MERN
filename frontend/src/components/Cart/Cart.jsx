@@ -1,46 +1,47 @@
-import React, { useState } from 'react'
-import { IoBagHandleOutline } from 'react-icons/io5'
-import { RxCross1 } from 'react-icons/rx'
-import { HiOutlineMinus, HiPlus, HiPlusSm } from 'react-icons/hi'
+import React, { useState } from "react";
+import { RxCross1 } from "react-icons/rx";
+import { IoBagHandleOutline } from "react-icons/io5";
+import { HiOutlineMinus, HiPlus } from "react-icons/hi";
 import styles from "../../styles/styles";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { addToCart, removeFromCart } from "../../redux/actions/cart";
-import { useDispatch, useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
-import { backend_url } from '../../server';
-
+import { toast } from "react-toastify";
+import { backend_url } from "../../server";
 
 const Cart = ({ setOpenCart }) => {
   const { cart } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
 
   const removeFromCartHandler = (data) => {
-    dispatch(removeFromCart(data)); // Pass the entire data object
-    toast.success("Item removed from cart");
-  }
+    dispatch(removeFromCart(data));
+  };
 
-  const totalPrice = cart.reduce((acc, item) => acc + (item.discount_price * item.qty), 0);
+  const totalPrice = cart.reduce(
+    (acc, item) => acc + item.qty * item.discountPrice,
+    0
+  );
 
   const quantityChangeHandler = (data) => {
     dispatch(addToCart(data));
-    toast.success("Cart updated successfully");
-  }
+  };
 
   // Function to get the proper image URL
   const getImageUrl = (image) => {
+    // If there's no image, return a default "no image" URL
     if (!image) return "/no-image.png";
-    
-    // If the image is already a full URL
-    if (typeof image === 'string' && image.startsWith('http')) {
+
+    // If the image is already a full URL (starts with http), return it
+    if (typeof image === "string" && image.startsWith("http")) {
       return image;
     }
-    
-    // If it's just a filename from the backend
+
+    // If it's just a filename, construct the full URL using backend_url
     return `${backend_url}/uploads/${image}`;
   };
 
   return (
-    <div className='fixed top-0 left-0 w-full bg-[#0000004b] h-screen z-10'>
+    <div className="fixed top-0 left-0 w-full bg-[#0000004b] h-screen z-10">
       <div className="fixed top-0 right-0 h-full w-[80%] 800px:w-[25%] bg-white flex flex-col overflow-y-scroll justify-between shadow-sm">
         {cart && cart.length === 0 ? (
           <div className="w-full h-screen flex items-center justify-center">
@@ -81,6 +82,7 @@ const Cart = ({ setOpenCart }) => {
                       data={i}
                       quantityChangeHandler={quantityChangeHandler}
                       removeFromCartHandler={removeFromCartHandler}
+                      getImageUrl={getImageUrl} // Pass the getImageUrl function to CartSingle component
                     />
                   ))}
               </div>
@@ -102,66 +104,54 @@ const Cart = ({ setOpenCart }) => {
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-const CartSingle = ({ data, quantityChangeHandler, removeFromCartHandler }) => {
+const CartSingle = ({
+  data,
+  quantityChangeHandler,
+  removeFromCartHandler,
+  getImageUrl, // Receive the getImageUrl function
+}) => {
   const [value, setValue] = useState(data.qty);
-  const totalPrice = data.discount_price * value;
-
-  console.log("check data", data)
-console.log("CartSingle data:", data);
+  const totalPrice = data.discountPrice * value;
 
   const increment = (data) => {
-    setValue(value + 1);
-    if(data.qty === 0) {
-      setValue(1);
+    if (data.stock < value) {
+      toast.error("Product stock limited!");
+    } else {
+      setValue(value + 1);
+      const updateCartData = { ...data, qty: value + 1 };
+      quantityChangeHandler(updateCartData);
     }
-    const updateCartData = {
-      ...data,
-      qty: value + 1
-    };
-    
-    // dispatch(addToCart(data));
-    toast.success("Item added to cart");
-  }
+  };
+
   const decrement = (data) => {
-    if (value > 1) {
-      setValue(value - 1);
-      const updateCartData = {
-        ...data,
-        qty: value - 1
-      };
-      // dispatch(addToCart(data));
-      toast.success("Item removed from cart");
-    }
-  }
-
-
+    setValue(value === 1 ? 1 : value - 1);
+    const updateCartData = { ...data, qty: value === 1 ? 1 : value - 1 };
+    quantityChangeHandler(updateCartData);
+  };
 
   return (
-    <div className='border-b p-4'>
-      <div className='w-full flex items-center'>
+    <div className="border-b p-4">
+      <div className="w-full flex items-center">
         <div>
           <div
             className={`bg-[#e44343] border border-[#e4434373] rounded-full w-[25px] h-[25px] ${styles.normalFlex} justify-center cursor-pointer`}
             onClick={() => increment(data)}
           >
-            <HiPlus size={18} color='#fff' />
+            <HiPlus size={18} color="#fff" />
           </div>
-          <span className='pl-[10px]'>
-            {/* {data.qty} */}
-            {value}
-          </span>
+          <span className="pl-[10px]">{value}</span>
           <div
-            className='bg-[#a7abb14f] rounded-full w-[25px] h-[25px] flex items-center justify-center cursor-pointer'
+            className="bg-[#a7abb14f] rounded-full w-[25px] h-[25px] flex items-center justify-center cursor-pointer"
             onClick={() => decrement(data)}
           >
-            <HiOutlineMinus size={16} color='#7d879c' />
+            <HiOutlineMinus size={16} color="#7d879c" />
           </div>
         </div>
         <img
-          src={getImageUrl(data?.images && data.images[0])}
+          src={getImageUrl(data?.images && data.images[0]?.url)} // Using the getImageUrl function
           alt={data.name}
           className="w-[130px] h-min ml-2 mr-2 rounded-[5px] object-cover"
           onError={(e) => {
@@ -169,24 +159,22 @@ console.log("CartSingle data:", data);
             e.target.src = "/no-image.png";
           }}
         />
-        <div className='pl-[5px]'>
-          <h1 className='font-[500] text-[14px] pt-[4px] font-Roboto text-justify'>{data.name}</h1>
-          <h4 className='font-[400] text-[15px] text-[#00000082]'>
-            ${data.discount_price || 0} * {value}
+        <div className="pl-[5px]">
+          <h1>{data.name}</h1>
+          <h4 className="font-[400] text-[15px] text-[#00000082]">
+            ${data.discountPrice} * {value}
           </h4>
-          <h4 className="font-[500] text-[17px] pt-[4px] text-[#d02222] font-Roboto">
-            US$ {totalPrice}
+          <h4 className="font-[600] text-[17px] pt-[3px] text-[#d02222] font-Roboto">
+            US${totalPrice}
           </h4>
         </div>
-        <RxCross1 
-          className='cursor-pointer w-12 h-12 relative top-8 right-0' 
-          onClick={() => removeFromCartHandler(data)} 
+        <RxCross1
+          className="cursor-pointer"
+          onClick={() => removeFromCartHandler(data)}
         />
       </div>
     </div>
   );
 };
 
-
-
-export default Cart
+export default Cart;
