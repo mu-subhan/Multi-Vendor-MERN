@@ -46,11 +46,34 @@ const shopSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-    createdAt: {
-        type: Date,
-        default: Date.now(),
+  availableBalance: {
+    type: Number,
+    default: 0,
+  },
+  transactions: [{
+    amount: Number,
+    status: {
+      type: String,
+      default: "Processing"
     },
-     resetPasswordToken: String,
+    createdAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
+  withdrawMethod: {
+    bankName: String,
+    bankCountry: String,
+    bankSwiftCode: String,
+    bankAccountNumber: String,
+    bankHolderName: String,
+    bankAddress: String
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now(),
+  },
+  resetPasswordToken: String,
   resetPasswordTime: Date,
 });
 

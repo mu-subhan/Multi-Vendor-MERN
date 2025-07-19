@@ -11,6 +11,7 @@ const ErrorHandler = require("../utils/ErrorHandler");
 const { upload } = require('../multer');
 const catchAsyncError = require('../middleware/catchAsyncError');
 const sendShopToken = require("../utils/ShopToken");
+const Order = require("../model/order");
 
 
 // Create activation token
@@ -318,5 +319,44 @@ router.put(
     }
   })
 );
+
+// get seller earnings
+router.get("/get-seller-earnings", isSeller, catchAsyncError(async (req, res, next) => {
+  try {
+    const seller = await Shop.findById(req.seller._id);
+
+    if (!seller) {
+      return next(new ErrorHandler("Seller not found", 404));
+    }
+
+    // Get all orders for this seller that are delivered
+    const orders = await Order.find({
+      "cart.shopId": seller._id,
+      status: "Delivered"
+    });
+
+    // Calculate total earnings
+    let totalEarnings = 0;
+    orders.forEach((order) => {
+      const serviceCharge = order.totalPrice * 0.10;
+      totalEarnings += (order.totalPrice - serviceCharge);
+    });
+
+    // Get recent transactions
+    const recentTransactions = seller.transactions ? 
+      seller.transactions.sort((a, b) => b.createdAt - a.createdAt).slice(0, 10) 
+      : [];
+
+    res.status(200).json({
+      success: true,
+      availableBalance: seller.availableBalance || 0,
+      totalEarnings,
+      recentTransactions
+    });
+
+  } catch (error) {
+    return next(new ErrorHandler(error.message, 500));
+  }
+}));
 
 module.exports = router

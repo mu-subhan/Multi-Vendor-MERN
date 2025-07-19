@@ -134,7 +134,16 @@ router.put(
       async function updateSellerInfo(amount) {
         const seller = await Shop.findById(req.seller.id);
         
-        seller.availableBalance = amount;
+        // Add to available balance instead of overwriting
+        seller.availableBalance = (seller.availableBalance || 0) + amount;
+
+        // Add transaction record
+        seller.transactions.push({
+          amount: amount,
+          status: "Credited",
+          orderId: order._id,
+          createdAt: new Date()
+        });
 
         await seller.save();
       }
