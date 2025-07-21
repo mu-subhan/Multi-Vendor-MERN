@@ -22,7 +22,7 @@ import axios from "axios";
 const ProductDetails = ({ data }) => {
   const { wishlist } = useSelector((state) => state.wishlist);
   const { cart } = useSelector((state) => state.cart);
-  const { user, isAuthenticated } = useSelector((state) => state.user);
+  const { user, isAuthentication } = useSelector((state) => state.user);
   const { products } = useSelector((state) => state.products);
   const [count, setCount] = useState(1);
   const [click, setClick] = useState(false);
@@ -89,27 +89,27 @@ const ProductDetails = ({ data }) => {
 
   const averageRating = avg.toFixed(2);
 
-
+ console.log(isAuthentication, "isAuthentication");
   const handleMessageSubmit = async () => {
-    // if (isAuthenticated) {
-    //   const groupTitle = data._id + user._id;
-    //   const userId = user._id;
-    //   const sellerId = data.shop._id;
-    //   await axios
-    //     .post(`${server}/conversation/create-new-conversation`, {
-    //       groupTitle,
-    //       userId,
-    //       sellerId,
-    //     })
-    //     .then((res) => {
-    //       navigate(`/inbox?${res.data.conversation._id}`);
-    //     })
-    //     .catch((error) => {
-    //       toast.error(error.response.data.message);
-    //     });
-    // } else {
-    //   toast.error("Please login to create a conversation");
-    // }
+    if (isAuthentication) {
+      const groupTitle = data._id + user._id;
+      const userId = user._id;
+      const sellerId = data.shop._id;
+      await axios
+        .post(`${server}/conversation/create-new-conversation`, {
+          groupTitle,
+          userId,
+          sellerId,
+        })
+        .then((res) => {
+          navigate(`/inbox?${res.data.conversation._id}`);
+        })
+        .catch((error) => {
+          toast.error(error.response.data.message);
+        });
+    } else {
+      toast.error("Please login to create a conversation");
+    }
   };
 
   return (
