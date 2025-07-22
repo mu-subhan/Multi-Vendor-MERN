@@ -5,44 +5,45 @@ const express = require("express");
 const { isSeller, isAuthentication } = require("../middleware/auth");
 const router = express.Router();
 
-
 // create a new conversation
-
-router.post("/create-new-conversation",catchAsyncError(async(req,res,next) =>{
+router.post(
+  "/create-new-conversation",
+  catchAsyncError
+  (async (req, res, next) => {
     try {
-        const {groupTitle,userId,
-          sellerId,} = req.body;
+      const { groupTitle, userId, sellerId } = req.body;
 
-        const isConversationExit = await Conversation.findOne({groupTitle});
+      const isConversationExist = await Conversation.findOne({ groupTitle });
 
-        if(isConversationExit){
-           const conversation =     isConversationExit;
-           res.status(201).json({
-            success:true,
-            conversation
-           })
-        }
-        else{
-            const conversation = await Conversation.create({
-            members:[userId,sellerId],
-            groupTitle:groupTitle,
-        })
+      if (isConversationExist) {
+        const conversation = isConversationExist;
         res.status(201).json({
-            success:true,
-            conversation,
-        })
-        }
+          success: true,
+          conversation,
+        });
+      } else {
+        const conversation = await Conversation.create({
+          members: [userId, sellerId],
+          groupTitle: groupTitle,
+        });
+
+        res.status(201).json({
+          success: true,
+          conversation,
+        });
+      }
     } catch (error) {
-        return next(new ErrorHandler(error.response.message),500)
+      return next(new ErrorHandler(error.response.message), 500);
     }
-}))
+  })
+);
 
-
-// get seller conversation 
+// get seller conversations
 router.get(
   "/get-all-conversation-seller/:id",
   isSeller,
-  catchAsyncError(async (req, res, next) => {
+  catchAsyncError
+  (async (req, res, next) => {
     try {
       const conversations = await Conversation.find({
         members: {
@@ -60,11 +61,13 @@ router.get(
   })
 );
 
+
 // get user conversations
 router.get(
   "/get-all-conversation-user/:id",
   isAuthentication,
-  catchAsyncError(async (req, res, next) => {
+  catchAsyncError
+  (async (req, res, next) => {
     try {
       const conversations = await Conversation.find({
         members: {
@@ -85,7 +88,8 @@ router.get(
 // update the last message
 router.put(
   "/update-last-message/:id",
-  catchAsyncError(async (req, res, next) => {
+  catchAsyncError
+  (async (req, res, next) => {
     try {
       const { lastMessage, lastMessageId } = req.body;
 

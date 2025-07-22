@@ -6,56 +6,63 @@ const { upload } = require("../multer");
 const Messages = require("../model/messages");
 const router = express.Router();
 
-// 
-router.post("/create-new-message",upload.array("images"),catchAsyncError(async(req,res,next)=>{
+// Create new message route
+router.post("/create-new-message", upload.array("images"), catchAsyncError(async (req, res, next) => {
     try {
-        const messageData = req.body;
-        if(req.body){
-            const files = req.files;
-            const imageUrls = files.map((file) =>`${file.fileName}`);
+        const { conversationId, sender, text } = req.body;
+
+        // Validate required fields
+        if (!conversationId || !sender || !text) {
+            return next(new ErrorHandler('Missing required fields: conversationId, sender, or text', 400));
+        }
+
+        const messageData = {
+            conversationId,
+            sender,
+            text,
+            images: []
+        };
+
+        // Handle file uploads
+        if (req.files && req.files.length > 0) {
+            const imageUrls = req.files.map(file => `${file.fileName}`);
             messageData.images = imageUrls;
         }
-        messageData.conversationId = req.body.conversationId;
-        messageData.sender = req.body.sender;      
-        messageData.text = req.body.text;
-        
 
-
+        // Create message
         const message = new Messages({
-            conversationId:messageData.conversationId,
-            sender:messageData.sender,
-            text:messageData.text,
-            images:messageData.images ? messageData.images :"undefined",
-        })
+            conversationId: messageData.conversationId,
+            sender: messageData.sender,
+            text: messageData.text,
+            images: messageData.images.length > 0 ? messageData.images : null,
+        });
+
         await message.save();
 
         res.status(201).json({
-            success:true,
+            success: true,
             message,
-        })
-        
-    } catch (error) {
-        return next(new ErrorHandler(error.response.message),500)
-    }
-}))
+        });
 
-// get all messages with conversation id
-router.get(
-  "/get-all-messages/:id",
-  catchAsyncError(async (req, res, next) => {
+    } catch (error) {
+        return next(new ErrorHandler(error.message, 500));
+    }
+}));
+
+// Get all messages with conversation id
+router.get("/get-all-messages/:id", catchAsyncError(async (req, res, next) => {
     try {
-      const messages = await Messages.find({
-        conversationId: req.params.id,
-      });
+        const messages = await Messages.find({
+            conversationId: req.params.id,
+        });
 
-      res.status(201).json({
-        success: true,
-        messages,
-      });
+        res.status(200).json({
+            success: true,
+            messages,
+        });
     } catch (error) {
-      return next(new ErrorHandler(error.message), 500);
+        return next(new ErrorHandler(error.message, 500));
     }
-  })
-);
+}));
 
 module.exports = router;
