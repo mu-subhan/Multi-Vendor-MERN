@@ -10,6 +10,7 @@ import ShopAllRefunds from "../pages/Shop/ShopAllRefunds"
 import ShopSettingPage from "../pages/Shop/ShopSettingPage"
 import ShopWithDrawPage from "../pages/Shop/ShopWithDrawPage"
 import ShopInboxPage from "../pages/Shop/ShopInboxPage"
+import UserInbox from "../pages/Shop/UserInbox"
 export {
     ShopDashboardPage,
     ShopCreateProduct,
@@ -23,4 +24,5 @@ export {
     ShopSettingPage,
     ShopWithDrawPage,
     ShopInboxPage,
+    UserInbox
 }
