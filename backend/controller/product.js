@@ -66,7 +66,7 @@ router.post("/create-product", upload.array("images"), catchAsyncError(async (re
 // get all products
 router.get("/get-all-products", catchAsyncError(async (req, res, next) => {
     try {
-        const products = await Product.find().populate("shop");
+        const products = await Product.find().populate("shop").sort({createdAt: -1});
         
         // Add full URLs to images
         const productsWithUrls = products.map(product => {
