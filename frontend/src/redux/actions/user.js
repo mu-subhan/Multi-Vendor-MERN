@@ -19,12 +19,16 @@ export const loginUser = (email, password) => async (dispatch) => {
             config
         );
 
+        if (!data.user) {
+            throw new Error(data.message || "Login failed");
+        }
+
         dispatch({ type: "LoadUserSuccess", payload: data.user });
-
-        // Immediately load user data after successful login
+        
+        // Ensure user data is loaded after login
         await dispatch(loadUser());
-
-        return data;
+        
+        return data.user;
     } catch (error) {
         dispatch({
             type: "LoadUserFail",
@@ -46,11 +50,12 @@ export const loadUser = () => async (dispatch) => {
             }
         });
 
-        if (!data.success) {
+        if (!data.user) {
             throw new Error(data.message || "Failed to load user");
         }
 
         dispatch({ type: "LoadUserSuccess", payload: data.user });
+        return data.user;
     } catch (error) {
         dispatch({
             type: "LoadUserFail",
@@ -61,6 +66,7 @@ export const loadUser = () => async (dispatch) => {
         if (error.response?.status === 401) {
             dispatch({ type: "ClearUser" });
         }
+        throw error;
     }
 };
   
