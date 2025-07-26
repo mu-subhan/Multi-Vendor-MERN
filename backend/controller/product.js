@@ -66,22 +66,17 @@ router.post("/create-product", upload.array("images"), catchAsyncError(async (re
 // get all products
 router.get("/get-all-products", catchAsyncError(async (req, res, next) => {
     try {
-        const products = await Product.find().populate("shop").sort({createdAt: -1});
-        
+        const products = await Product.find().populate("shop").sort({ createdAt: -1 });
+
         // Add full URLs to images
         const productsWithUrls = products.map(product => {
             const productObj = product.toObject();
-            productObj.images = productObj.images.map(img => {
-                // If the image is already a full URL, return as is
-                if (typeof img === 'string' && img.startsWith('http')) {
-                    return img;
-                }
-                // Otherwise, construct the full URL
-                return `${process.env.BACKEND_URL || 'http://localhost:8000'}/uploads/${img}`;
-            });
+            productObj.images = productObj.images.map(img => ({
+                url: img.startsWith("http") ? img : `${process.env.BACKEND_URL || 'http://localhost:8000'}/uploads/${img}`
+            }));
             return productObj;
         });
-        
+
         res.status(200).json({
             success: true,
             products: productsWithUrls,
@@ -94,29 +89,25 @@ router.get("/get-all-products", catchAsyncError(async (req, res, next) => {
 // get all products of shop
 router.get("/get-all-products-shop/:id", catchAsyncError(async (req, res, next) => {
     try {
-        console.log("Fetching products for shop ID:", req.params.id);
         const products = await Product.find({ shopId: req.params.id });
-        
+
         // Add full URLs to images
         const productsWithUrls = products.map(product => {
             const productObj = product.toObject();
             productObj.images = productObj.images.map(img => ({
-                url: img.url || `${process.env.BACKEND_URL}/uploads/${img}`
+                url: img.startsWith("http") ? img : `${process.env.BACKEND_URL || 'http://localhost:8000'}/uploads/${img}`
             }));
             return productObj;
         });
-        
-        console.log("Found products:", productsWithUrls);
-        
+
         res.status(200).json({
             success: true,
             products: productsWithUrls,
-        })
+        });
     } catch (error) {
-        console.error("Error fetching products:", error);
-        return next(new ErrorHandler(error, 400))   
+        return next(new ErrorHandler(error.message, 400));
     }
-}))
+}));
 
 // delete product of a shop
 router.delete("/delete-shop-product/:id", isSeller, catchAsyncError(async (req, res, next) => {
