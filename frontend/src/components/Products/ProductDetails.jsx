@@ -112,6 +112,18 @@ const ProductDetails = ({ data }) => {
       toast.error("Please login to create a conversation");
     }
   };
+ 
+const getImageUrl = (image) => {
+  if (!image) return "/no-image.png"; // Default image if no URL is provided
+
+  // If the image is already a full URL, return it as is
+  if (typeof image === "string" && (image.startsWith("http") || image.startsWith("https"))) {
+    return image;
+  }
+
+  // Otherwise, assume it's a filename and prepend the backend URL
+  return `${process.env.REACT_APP_BACKEND_URL || "http://localhost:8000"}/uploads/${image}`;
+};
 
   // console.log(data, "data in product details");
   // console.log(data?.images, "Images in ProductDetails");
@@ -208,16 +220,13 @@ const ProductDetails = ({ data }) => {
                 </div>
                 <div className="flex items-center pt-8">
                   <Link to={`/shop/${data?.shop._id}`}>
-                    {console.log(`${backend_url}uploads/${data.shop?.avatar?.url}`, "Shop Image URL")}
-                    {/* {console.log(data.shop, "Shop Data")} */}
 
-<img
-  src={data.shop?.avatar?.url.startsWith("http") 
-    ? data.shop.avatar.url 
-    : `${backend_url}/uploads/${data.shop.avatar.url}`}
-  alt="Shop Avatar"
-  className="w-[50px] h-[50px] rounded-full mr-2"
-/>
+                    {console.log("Image URL:", getImageUrl(data.shop?.avatar?.url))}
+                    <img
+                      src={getImageUrl(data.shop?.avatar?.url)}
+                      alt="Shop image"
+                      className="w-[50px] h-[50px] rounded-full mr-2"
+                    />
                   </Link>
                   <div className="pr-8">
                     <Link to={`/shop/${data?.shop._id}`}>
@@ -226,7 +235,7 @@ const ProductDetails = ({ data }) => {
                       </h3>
                     </Link>
                     <h5 className="pb-3 text-[15px]">
-                      {averageRating}/ Ratings
+                      {averageRating}/5 Ratings
                     </h5>
                   </div>
                   <div
@@ -246,6 +255,7 @@ const ProductDetails = ({ data }) => {
             products={products}
             totalReviewsLength={totalReviewsLength}
             averageRating={averageRating}
+            getImageUrl={getImageUrl}
           />
           <br />
           <br />
@@ -260,6 +270,7 @@ const ProductDetailsInfo = ({
   products,
   totalReviewsLength,
   averageRating,
+  getImageUrl
 
 }) => {
   const { user } = useSelector((state) => state.user);
@@ -457,11 +468,13 @@ const ProductDetailsInfo = ({
           <div className="w-full 800px:w-[50%]">
             <Link to={`/shop/preview/${data.shop._id}`}>
               <div className="flex items-center">
-                <img
-                  src={`${data?.shop?.avatar?.url}`}
-                  className="w-[50px] h-[50px] rounded-full"
-                  alt=""
-                />
+                {/* {console.log("Shop Avatar URL:", `${backend_url}uploads/${data?.shop?.avatar?.url}`)} */}
+                {console.log("Shop Avatar URL:", data?.shop?.avatar?.url)}
+               <img
+    src={getImageUrl(data?.shop?.avatar?.url)}
+    className="w-[50px] h-[50px] rounded-full"
+    alt="Shop Avatar"
+/>
                 <div className="pl-3">
                   <h3 className={`${styles.shop_name}`}>{data.shop.name}</h3>
                   <h5 className="pb-2 text-[15px]">

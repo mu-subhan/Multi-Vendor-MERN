@@ -51,7 +51,8 @@ export const loadUser = () => async (dispatch) => {
         });
 
         if (!data.user) {
-            throw new Error(data.message || "Failed to load user");
+            // throw new Error(data.message || "Failed to load user");
+            console.log(data)
         }
 
         dispatch({ type: "LoadUserSuccess", payload: data.user });
