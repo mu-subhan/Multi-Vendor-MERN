@@ -1,58 +1,59 @@
-import React from 'react'
-import styles from '../../../styles/styles'
-import { brandingData, categoriesData } from '../../../static/data'
-import { useNavigate } from 'react-router-dom'
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { brandingData, categoriesData } from '../../../static/data';
 
 const Categories = () => {
   const navigate = useNavigate();
+
   return (
-    <div>
-      
-      <div className= {`${styles.section} hidden sm:block`}>
-        <div className={`branding my-12 flex justify-between bg-white w-full shadow-sm p-5 rounded-md`}>
-            {
-                brandingData && brandingData.map((i,index) => (
-                    <div className='flex items-start' key={index}>
-                        {i.icon}
-                        <div className='px-3'>
-                            <h3 className='font-bold text-sm md:text-base'>{i.title}</h3>
-                            <p className='text-xs md:text-sm'>{i.Description}</p>
-                            </div>
-                        </div>
-                ))
-            }
+    <div className="container mx-auto px-4 py-8">
+      {/* Branding Section */}
+      <div className="hidden sm:block mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 bg-white p-6 rounded-xl shadow-md">
+          {brandingData.map((item, index) => (
+            <motion.div
+              key={index}
+              whileHover={{ y: -5 }}
+              className="flex items-start p-4 hover:bg-gray-50 rounded-lg transition-colors"
+            >
+              <div className="text-3xl text-blue-600 mr-4">{item.icon}</div>
+              <div>
+                <h3 className="font-bold text-lg text-gray-800 mb-1">{item.title}</h3>
+                <p className="text-sm text-gray-600">{item.Description}</p>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </div>
 
-
-      <div className={`${styles.section} bg-white p-6 rounded-lg mb-12`} id="categories">
-  <div className='grid grid-cols-1 gap-[5px] md:grid-cols-2 md:gap-[10px] lg:grid-cols-4 lg:gap-[20px] xl:grid-cols-5 xl:gap-[30px]'>
-    {
-      categoriesData && categoriesData.map((i) => {
-        const handleSubmit = (i) => {
-          navigate(`/product?category=${i.title}`);
-        };
-
-        return (
-          <div 
-            className='w-full h-[100px] flex items-center justify-between cursor-pointer overflow-hidden' 
-            key={i.id}
-            onClick={() => handleSubmit(i)}
-          >
-            <h5 className={`text-[18px] leading-[1.3]`}>{i.title}</h5>
-            <img src={i.image_Url}
-            className='w-[120px] object-cover'
-            alt='' /> 
-          </div>
-        );
-      })
-    }
-  </div>
-</div>
-
-
+      {/* Categories Section */}
+      <div className="bg-white p-8 rounded-xl shadow-md mb-12">
+        <h2 className="text-2xl font-bold text-gray-800 mb-6">Shop by Categories</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+          {categoriesData.map((category) => (
+            <motion.div
+              key={category.id}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => navigate(`/product?category=${category.title}`)}
+              className="group relative h-40 bg-gray-50 rounded-lg overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-all"
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent z-10"></div>
+              <img
+                src={category.image_Url}
+                alt={category.title}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+              <div className="absolute bottom-0 left-0 z-20 p-4 w-full bg-gradient-to-t from-black/70 to-transparent">
+                <h3 className="text-lg font-semibold text-white">{category.title}</h3>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default Categories
+export default Categories;

@@ -85,11 +85,12 @@ const ProductDetails = ({ data }) => {
       0
     );
 
-  const avg =  totalRatings / totalReviewsLength || 0;
+  const avg = totalRatings / totalReviewsLength || 0;
 
   const averageRating = avg.toFixed(2);
 
- console.log(isAuthentication, "isAuthentication");
+  //  console.log(isAuthentication, "isAuthentication");
+
   const handleMessageSubmit = async () => {
     if (isAuthentication) {
       const groupTitle = data._id + user._id;
@@ -112,6 +113,8 @@ const ProductDetails = ({ data }) => {
     }
   };
 
+  // console.log(data, "data in product details");
+  // console.log(data?.images, "Images in ProductDetails");
   return (
     <div className="bg-white">
       {data ? (
@@ -128,22 +131,20 @@ const ProductDetails = ({ data }) => {
                   {data &&
                     data.images.map((i, index) => (
                       <div
-                        className={`${
-                          select === 0 ? "border" : "null"
-                        } cursor-pointer`}
+                        className={`${select === 0 ? "border" : "null"
+                          } cursor-pointer`}
                       >
-                        <img
-                          src={`${i?.url}`}
-                          alt=""
+                        {/* <img
+                          src={`${i || "/no images.png"}`}
+                          alt="prduct "
                           className="h-[200px] overflow-hidden mr-3 mt-3"
                           onClick={() => setSelect(index)}
-                        />
+                        /> */}
                       </div>
                     ))}
                   <div
-                    className={`${
-                      select === 1 ? "border" : "null"
-                    } cursor-pointer`}
+                    className={`${select === 1 ? "border" : "null"
+                      } cursor-pointer`}
                   ></div>
                 </div>
               </div>
@@ -207,11 +208,16 @@ const ProductDetails = ({ data }) => {
                 </div>
                 <div className="flex items-center pt-8">
                   <Link to={`/shop/${data?.shop._id}`}>
-                    <img
-                      src={`${backend_url}${data?.shop?.images?.url}`}
-                      alt=""
-                      className="w-[50px] h-[50px] rounded-full mr-2"
-                    />
+                    {console.log(`${backend_url}uploads/${data.shop?.avatar?.url}`, "Shop Image URL")}
+                    {/* {console.log(data.shop, "Shop Data")} */}
+
+<img
+  src={data.shop?.avatar?.url.startsWith("http") 
+    ? data.shop.avatar.url 
+    : `${backend_url}/uploads/${data.shop.avatar.url}`}
+  alt="Shop Avatar"
+  className="w-[50px] h-[50px] rounded-full mr-2"
+/>
                   </Link>
                   <div className="pr-8">
                     <Link to={`/shop/${data?.shop._id}`}>
@@ -220,7 +226,7 @@ const ProductDetails = ({ data }) => {
                       </h3>
                     </Link>
                     <h5 className="pb-3 text-[15px]">
-                     {averageRating}/ Ratings
+                      {averageRating}/ Ratings
                     </h5>
                   </div>
                   <div
@@ -254,7 +260,7 @@ const ProductDetailsInfo = ({
   products,
   totalReviewsLength,
   averageRating,
-  
+
 }) => {
   const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
@@ -265,7 +271,7 @@ const ProductDetailsInfo = ({
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();
-    
+
     if (!rating || !comment) {
       toast.error("Please provide both rating and comment");
       return;
@@ -377,9 +383,8 @@ const ProductDetailsInfo = ({
                         key={star}
                         type="button"
                         onClick={() => setRating(star)}
-                        className={`text-2xl ${
-                          rating >= star ? "text-yellow-500" : "text-gray-300"
-                        } focus:outline-none`}
+                        className={`text-2xl ${rating >= star ? "text-yellow-500" : "text-gray-300"
+                          } focus:outline-none`}
                       >
                         ★
                       </button>
@@ -401,9 +406,8 @@ const ProductDetailsInfo = ({
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`bg-[#6443d1] text-white px-4 py-2 rounded-lg hover:bg-[#5436b0] transition-all ${
-                    isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
+                  className={`bg-[#6443d1] text-white px-4 py-2 rounded-lg hover:bg-[#5436b0] transition-all ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                 >
                   {isSubmitting ? "Submitting..." : "Submit Review"}
                 </button>
@@ -485,9 +489,9 @@ const ProductDetailsInfo = ({
               <h5 className="font-[600] pt-3">
                 Total Reviews:{" "}
                 <span className="font-[500]">
-                    ****
-                    {totalReviewsLength}
-                    </span>
+                  ****
+                  {totalReviewsLength}
+                </span>
               </h5>
               <Link to="/">
                 <div

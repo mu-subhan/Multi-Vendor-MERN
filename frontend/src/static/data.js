@@ -229,13 +229,13 @@ export const navItems = [
       title: "Gifts",
       subTitle: "",
       image_Url:
-        "https://securecdn.pymnts.com/wp-content/uploads/2014/11/Gifts-Photo-700x489.jpg",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHlLRWGLMxAC8dxmNFfOPvGPqh_KhEVOQKLQ&s",
     },
     {
       id: 7,
-      title: "Pet Care",
+      title: "Painting",
       subTitle: "",
-      image_Url: "https://cdn.openpr.com/T/c/Tc15444071_g.jpg",
+      image_Url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQpQfRgdz41D3sa3nPavUa46B5GfygILOeKnA&s",
     },
     {
       id: 8,

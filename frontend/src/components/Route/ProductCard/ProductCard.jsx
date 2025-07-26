@@ -53,32 +53,39 @@ const ProductCard = ({ data }) => {
   };
 
   // Function to get the proper image URL
-  const getImageUrl = (image) => {
-    if (!image) return "/no-image.png";
-    
-    // If the image is already a full URL
-    if (typeof image === 'string' && image.startsWith('http')) {
-      return image;
-    }
-    
-    // If it's just a filename from the backend
-    return `${backend_url}/uploads/${image}`;
-  };
+ const getImageUrl = (image) => {
+  if (!image) return "/no-image.png";
 
+  // If the image is an object, access its `url` property
+  if (typeof image === "object" && image.url) {
+    return image.url;
+  }
+
+  // If the image is already a full URL
+  if (typeof image === "string" && image.startsWith("http")) {
+    return image;
+  }
+
+  // If it's just a filename from the backend
+  return `${backend_url}uploads/${image}`;
+};
+
+  // console.log("ProductCard data: for product", `${backend_url}uploads/${data.images[0]}`);
+  // console.log("ProductCard data: for images", data.images);
   return (
     <>
       <div className="w-full h-[370px] bg-white rounded-lg shadow-sm p-3 relative cursor-pointer">
         <div className="flex justify-end"></div>
         <Link to={`/product/${data._id}`}>
           <img
-            src={getImageUrl(data.images && data.images[0])}
-            alt={data.name}
-            className="w-full h-[170px] object-contain"
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = "/no-image.png";
-            }}
-          />
+  src={getImageUrl(data.images && data.images[0])}
+  alt=" Image"
+  className="w-full h-[170px] object-contain"
+  onError={(e) => {
+    e.target.onerror = null;
+    e.target.src = "/no-image.png"; // Fallback image
+  }}
+/>
         </Link>
         <Link to={`/product/${data._id}`}>
           <h4 className="pb-3 font-[500]">
