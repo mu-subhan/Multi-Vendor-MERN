@@ -23,7 +23,7 @@ const Header = ({ activeHeading }) => {
   const { cart } = useSelector((state) => state.cart);
   const { wishlist } = useSelector((state) => state.wishlist);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const {isSeller } = useSelector((state)=>state.seller)
   const [searchData, setSearchData] = useState(null);
   const [active, setActive] = useState(false);
   const [dropDown, setDropDown] = useState(false);
@@ -57,11 +57,14 @@ const Header = ({ activeHeading }) => {
     if (isAuthenticated && user) {
       return (
         <Link to="/profile">
-          <img
-            src={user?.avatar?.url || "/default-avatar.png"}
-            alt="profile"
-            className="w-32 h-12 object-cover rounded-full border-[3px] border-[#0eae88]"
-          />
+          <div className="w-8 h-9 rounded-full border-[3px] border-[#0eae88] overflow-hidden">
+  <img
+    src={user?.avatar?.url || "/default-avatar.png"}
+    alt="profile"
+    className="w-full h-full object-cover"
+  />
+</div>
+
         </Link>
       );
     }
@@ -127,9 +130,9 @@ const Header = ({ activeHeading }) => {
           </div>
 
           <div className={`${styles.button}`}>
-            <Link to="/shop-create">
+            <Link to={`${isSeller ? "/dashboard" : "/shop-create"}`}>
               <h1 className="text-[#fff] flex items-center">
-                Become Seller <IoIosArrowForward className="ml-1" />
+               {isSeller ?  "Seller Dashboard": "Become Seller "}  <IoIosArrowForward className="ml-1" />
               </h1>
             </Link>
           </div>
@@ -253,9 +256,9 @@ const Header = ({ activeHeading }) => {
       <div
         className={`${
           active === true ? "shadow-sm fixed top-0 left-0 z-10" : null
-        } transition hidden 800px:flex items-center justify-between w-full bg-[#3321c8] h-[70px]`}
+        } transition hidden 800px:flex items-center justify-between w-full bg-gray-800 h-[70px]`}
       >
-        <div className={`${styles.section} justify-between px-8`}>
+        <div className={`flex items-center justify-between px-8`}>
           {/* categories */}
 
           <div onClick={() => setDropDown(!dropDown)}>
@@ -283,7 +286,7 @@ const Header = ({ activeHeading }) => {
 
         {/* Nav items */}
 
-        <div className={`${styles.normalFlex}`}>
+        <div className={`flex-1 flex justify-center`}>
           <Navbar active={activeHeading} />
         </div>
 
@@ -329,7 +332,7 @@ const Header = ({ activeHeading }) => {
           </div>
         </div>
       </div>
-    </>
+    </> 
   );
 };
 

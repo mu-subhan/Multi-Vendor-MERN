@@ -22,7 +22,7 @@ import axios from "axios";
 const ProductDetails = ({ data }) => {
   const { wishlist } = useSelector((state) => state.wishlist);
   const { cart } = useSelector((state) => state.cart);
-  const { user, isAuthenticated } = useSelector((state) => state.user);
+  const { user, isAuthentication } = useSelector((state) => state.user);
   const { products } = useSelector((state) => state.products);
   const [count, setCount] = useState(1);
   const [click, setClick] = useState(false);
@@ -73,45 +73,60 @@ const ProductDetails = ({ data }) => {
     }
   };
 
-//   const totalReviewsLength =
-//     products &&
-//     products.reduce((acc, product) => acc + product.reviews.length, 0);
+  const totalReviewsLength =
+    products &&
+    products.reduce((acc, product) => acc + product.reviews.length, 0);
 
-//   const totalRatings =
-//     products &&
-//     products.reduce(
-//       (acc, product) =>
-//         acc + product.reviews.reduce((sum, review) => sum + review.rating, 0),
-//       0
-//     );
+  const totalRatings =
+    products &&
+    products.reduce(
+      (acc, product) =>
+        acc + product.reviews.reduce((sum, review) => sum + review.rating, 0),
+      0
+    );
 
-//   const avg =  totalRatings / totalReviewsLength || 0;
+  const avg = totalRatings / totalReviewsLength || 0;
 
-//   const averageRating = avg.toFixed(2);
+  const averageRating = avg.toFixed(2);
 
+  //  console.log(isAuthentication, "isAuthentication");
 
   const handleMessageSubmit = async () => {
-    // if (isAuthenticated) {
-    //   const groupTitle = data._id + user._id;
-    //   const userId = user._id;
-    //   const sellerId = data.shop._id;
-    //   await axios
-    //     .post(`${server}/conversation/create-new-conversation`, {
-    //       groupTitle,
-    //       userId,
-    //       sellerId,
-    //     })
-    //     .then((res) => {
-    //       navigate(`/inbox?${res.data.conversation._id}`);
-    //     })
-    //     .catch((error) => {
-    //       toast.error(error.response.data.message);
-    //     });
-    // } else {
-    //   toast.error("Please login to create a conversation");
-    // }
+    if (isAuthentication) {
+      const groupTitle = data._id + user._id;
+      const userId = user._id;
+      const sellerId = data.shop._id;
+      await axios
+        .post(`${server}/conversation/create-new-conversation`, {
+          groupTitle,
+          userId,
+          sellerId,
+        })
+        .then((res) => {
+          navigate(`/inbox?${res.data.conversation._id}`);
+        })
+        .catch((error) => {
+          toast.error(error.response.data.message);
+        });
+    } else {
+      toast.error("Please login to create a conversation");
+    }
   };
+ 
+const getImageUrl = (image) => {
+  if (!image) return "/no-image.png"; // Default image if no URL is provided
 
+  // If the image is already a full URL, return it as is
+  if (typeof image === "string" && (image.startsWith("http") || image.startsWith("https"))) {
+    return image;
+  }
+
+  // Otherwise, assume it's a filename and prepend the backend URL
+  return `${process.env.REACT_APP_BACKEND_URL || "http://localhost:8000"}/uploads/${image}`;
+};
+
+  // console.log(data, "data in product details");
+  // console.log(data?.images, "Images in ProductDetails");
   return (
     <div className="bg-white">
       {data ? (
@@ -128,22 +143,20 @@ const ProductDetails = ({ data }) => {
                   {data &&
                     data.images.map((i, index) => (
                       <div
-                        className={`${
-                          select === 0 ? "border" : "null"
-                        } cursor-pointer`}
+                        className={`${select === 0 ? "border" : "null"
+                          } cursor-pointer`}
                       >
-                        <img
-                          src={`${i?.url}`}
-                          alt=""
+                        {/* <img
+                          src={`${i || "/no images.png"}`}
+                          alt="prduct "
                           className="h-[200px] overflow-hidden mr-3 mt-3"
                           onClick={() => setSelect(index)}
-                        />
+                        /> */}
                       </div>
                     ))}
                   <div
-                    className={`${
-                      select === 1 ? "border" : "null"
-                    } cursor-pointer`}
+                    className={`${select === 1 ? "border" : "null"
+                      } cursor-pointer`}
                   ></div>
                 </div>
               </div>
@@ -207,9 +220,11 @@ const ProductDetails = ({ data }) => {
                 </div>
                 <div className="flex items-center pt-8">
                   <Link to={`/shop/${data?.shop._id}`}>
+
+                    {console.log("Image URL:", getImageUrl(data.shop?.avatar?.url))}
                     <img
-                      src={`${backend_url}${data?.shop?.images?.url}`}
-                      alt=""
+                      src={getImageUrl(data.shop?.avatar?.url)}
+                      alt="Shop image"
                       className="w-[50px] h-[50px] rounded-full mr-2"
                     />
                   </Link>
@@ -220,7 +235,7 @@ const ProductDetails = ({ data }) => {
                       </h3>
                     </Link>
                     <h5 className="pb-3 text-[15px]">
-                      0/5 Ratings
+                      {averageRating}/5 Ratings
                     </h5>
                   </div>
                   <div
@@ -238,8 +253,9 @@ const ProductDetails = ({ data }) => {
           <ProductDetailsInfo
             data={data}
             products={products}
-            // totalReviewsLength={totalReviewsLength}
-            // averageRating={averageRating}
+            totalReviewsLength={totalReviewsLength}
+            averageRating={averageRating}
+            getImageUrl={getImageUrl}
           />
           <br />
           <br />
@@ -252,10 +268,62 @@ const ProductDetails = ({ data }) => {
 const ProductDetailsInfo = ({
   data,
   products,
-//   totalReviewsLength,
-//   averageRating,
+  totalReviewsLength,
+  averageRating,
+  getImageUrl
+
 }) => {
+  const { user } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
   const [active, setActive] = useState(1);
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmitReview = async (e) => {
+    e.preventDefault();
+
+    if (!rating || !comment) {
+      toast.error("Please provide both rating and comment");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      const reviewData = {
+        rating,
+        comment,
+        productId: data._id,
+        user: {
+          _id: user._id,
+          name: user.name,
+          avatar: user.avatar
+        }
+      };
+
+      const config = {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true,
+      };
+
+      const { data: responseData } = await axios.post(
+        `${server}/product/create-review`,
+        reviewData,
+        config
+      );
+
+      toast.success(responseData.message || "Review submitted successfully!");
+      setRating(0);
+      setComment("");
+
+      // Refresh the product data to show the new review
+      window.location.reload();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to submit review");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="bg-[#f5f6fb] px-3 800px:px-10 py-2 rounded">
@@ -300,6 +368,7 @@ const ProductDetailsInfo = ({
           ) : null}
         </div>
       </div>
+
       {active === 1 ? (
         <>
           <p className="py-2 text-[18px] leading-8 pb-10 whitespace-pre-line">
@@ -309,28 +378,86 @@ const ProductDetailsInfo = ({
       ) : null}
 
       {active === 2 ? (
-        <div className="w-full min-h-[40vh] flex flex-col items-center py-3 overflow-y-scroll">
-          {data &&
-            data.reviews.map((item, index) => (
-              <div className="w-full flex my-2">
-                <img
-                  src={`${item.user.avatar?.url}`}
-                  alt=""
-                  className="w-[50px] h-[50px] rounded-full"
-                />
-                <div className="pl-2 ">
-                  <div className="w-full flex items-center">
-                    <h1 className="font-[500] mr-3">{item.user.name}</h1>
-                    <Ratings rating={data?.ratings} />
+        <div className="w-full min-h-[40vh] flex flex-col py-3">
+          {/* Review submission form */}
+          {user ? (
+            <div className="w-full flex flex-col items-center">
+              <h2 className="text-[20px] font-[500] mb-4">Submit Your Review</h2>
+              <form onSubmit={handleSubmitReview} className="w-full max-w-[600px]">
+                <div className="w-full flex items-center mb-4">
+                  <label className="block text-gray-700 text-sm font-bold mr-2">
+                    Rating:
+                  </label>
+                  <div className="flex">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setRating(star)}
+                        className={`text-2xl ${rating >= star ? "text-yellow-500" : "text-gray-300"
+                          } focus:outline-none`}
+                      >
+                        ★
+                      </button>
+                    ))}
                   </div>
-                  <p>{item.comment}</p>
                 </div>
-              </div>
-            ))}
+                <div className="mb-4">
+                  <label className="block text-gray-700 text-sm font-bold mb-2">
+                    Your Review:
+                  </label>
+                  <textarea
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
+                    rows="4"
+                    placeholder="Write your review here..."
+                  ></textarea>
+                </div>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className={`bg-[#6443d1] text-white px-4 py-2 rounded-lg hover:bg-[#5436b0] transition-all ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                >
+                  {isSubmitting ? "Submitting..." : "Submit Review"}
+                </button>
+              </form>
+            </div>
+          ) : (
+            <div className="w-full text-center">
+              <p>Please login to submit a review</p>
+            </div>
+          )}
 
-          <div className="w-full flex justify-center">
-            {data && data.reviews.length === 0 && (
-              <h5>No Reviews have for this product!</h5>
+          {/* Existing reviews display */}
+          <div className="w-full mt-8">
+            <h2 className="text-[20px] font-[500] mb-4">Product Reviews</h2>
+            {data &&
+              data.reviews.map((item, index) => (
+                <div className="w-full flex my-4" key={index}>
+                  <img
+                    src={item.user.avatar?.url || "/default-avatar.png"}
+                    alt=""
+                    className="w-[50px] h-[50px] rounded-full"
+                  />
+                  <div className="pl-2">
+                    <div className="w-full flex items-center">
+                      <h1 className="font-[500] mr-3">{item.user.name}</h1>
+                      <Ratings rating={item.rating} />
+                    </div>
+                    <p className="font-[400] text-[#000000a7]">{item.comment}</p>
+                    <p className="text-[#000000a7] text-[14px]">
+                      {new Date(item.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              ))}
+
+            {(!data?.reviews || data.reviews.length === 0) && (
+              <h5 className="w-full text-center py-5 text-[18px]">
+                No Reviews for this product yet!
+              </h5>
             )}
           </div>
         </div>
@@ -341,16 +468,17 @@ const ProductDetailsInfo = ({
           <div className="w-full 800px:w-[50%]">
             <Link to={`/shop/preview/${data.shop._id}`}>
               <div className="flex items-center">
-                <img
-                  src={`${data?.shop?.avatar?.url}`}
-                  className="w-[50px] h-[50px] rounded-full"
-                  alt=""
-                />
+                {/* {console.log("Shop Avatar URL:", `${backend_url}uploads/${data?.shop?.avatar?.url}`)} */}
+                {console.log("Shop Avatar URL:", data?.shop?.avatar?.url)}
+               <img
+    src={getImageUrl(data?.shop?.avatar?.url)}
+    className="w-[50px] h-[50px] rounded-full"
+    alt="Shop Avatar"
+/>
                 <div className="pl-3">
                   <h3 className={`${styles.shop_name}`}>{data.shop.name}</h3>
                   <h5 className="pb-2 text-[15px]">
-                    {/* ({averageRating}/5) */}
-                   4/8  Ratings
+                    ({averageRating}/5)
                   </h5>
                 </div>
               </div>
@@ -374,9 +502,9 @@ const ProductDetailsInfo = ({
               <h5 className="font-[600] pt-3">
                 Total Reviews:{" "}
                 <span className="font-[500]">
-                    ****
-                    {/* {totalReviewsLength} */}
-                    </span>
+                  ****
+                  {totalReviewsLength}
+                </span>
               </h5>
               <Link to="/">
                 <div

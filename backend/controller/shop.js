@@ -6,11 +6,12 @@ const sendMail = require("../utils/sendMail");
 const sendToken = require("../utils/jwtToken");
 const fs = require("fs");
 const Shop = require("../model/shop");
-const { isAuthenticated, isSeller } = require("../middleware/auth");
+const {  isSeller } = require("../middleware/auth");
 const ErrorHandler = require("../utils/ErrorHandler");
 const { upload } = require('../multer');
 const catchAsyncError = require('../middleware/catchAsyncError');
 const sendShopToken = require("../utils/ShopToken");
+const Order = require("../model/order");
 
 
 // Create activation token
@@ -223,5 +224,139 @@ router.get("/logout",catchAsyncError(async(req,res,next) =>{
         return next(new ErrorHandler(error.message,500))        
        }
 }))
+
+// get shop info
+router.get(
+  "/get-shop-info/:id",
+  catchAsyncError(async (req, res, next) => {
+    try {
+      const shop = await Shop.findById(req.params.id);
+      res.status(201).json({
+        success: true,
+        shop,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
+);
+
+// update shop profile picture
+router.put(
+  "/update-shop-avatar",
+  isSeller,
+  upload.single("image"),
+  catchAsyncError(async (req, res, next) => {
+    try {
+      if (!req.file) {
+        return next(new ErrorHandler("Please upload an image", 400));
+      }
+
+      const existsSeller = await Shop.findById(req.seller._id);
+      
+      if (!existsSeller) {
+        return next(new ErrorHandler("Shop not found", 404));
+      }
+
+      // Delete old avatar if exists
+      if (existsSeller.avatar && existsSeller.avatar.url) {
+        const oldFilename = existsSeller.avatar.url.split("/").pop();
+        const existAvatarPath = path.join(__dirname, "../uploads", oldFilename);
+        if (fs.existsSync(existAvatarPath)) {
+          fs.unlinkSync(existAvatarPath);
+        }
+      }
+      
+      // Save new avatar
+      const filename = req.file.filename;
+      const fileUrl = `${req.protocol}://${req.get("host")}/uploads/${filename}`;
+      const avatar = {
+        public_id: filename,
+        url: fileUrl,
+      };
+      
+      existsSeller.avatar = avatar;
+      await existsSeller.save();
+
+      res.status(200).json({
+        success: true,
+        seller: existsSeller,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
+);
+
+// update seller info
+router.put(
+  "/update-seller-info",
+  isSeller,
+  catchAsyncError(async (req, res, next) => {
+    try {
+      const { name, description, address, phoneNumber, zipCode } = req.body;
+
+      const shop = await Shop.findById(req.seller._id);
+
+      if (!shop) {
+        return next(new ErrorHandler("Shop not found", 404));
+      }
+
+      shop.name = name;
+      shop.description = description;
+      shop.address = address;
+      shop.phoneNumber = phoneNumber;
+      shop.zipCode = zipCode;
+
+      await shop.save();
+
+      res.status(200).json({
+        success: true,
+        seller: shop,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
+);
+
+// get seller earnings
+router.get("/get-seller-earnings", isSeller, catchAsyncError(async (req, res, next) => {
+  try {
+    const seller = await Shop.findById(req.seller._id);
+
+    if (!seller) {
+      return next(new ErrorHandler("Seller not found", 404));
+    }
+
+    // Get all orders for this seller that are delivered
+    const orders = await Order.find({
+      "cart.shopId": seller._id,
+      status: "Delivered"
+    });
+
+    // Calculate total earnings
+    let totalEarnings = 0;
+    orders.forEach((order) => {
+      const serviceCharge = order.totalPrice * 0.10;
+      totalEarnings += (order.totalPrice - serviceCharge);
+    });
+
+    // Get recent transactions
+    const recentTransactions = seller.transactions ? 
+      seller.transactions.sort((a, b) => b.createdAt - a.createdAt).slice(0, 10) 
+      : [];
+
+    res.status(200).json({
+      success: true,
+      availableBalance: seller.availableBalance || 0,
+      totalEarnings,
+      recentTransactions
+    });
+
+  } catch (error) {
+    return next(new ErrorHandler(error.message, 500));
+  }
+}));
 
 module.exports = router

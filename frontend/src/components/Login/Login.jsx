@@ -2,10 +2,9 @@ import { React, useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import styles from "../../styles/styles";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
-import { server } from "../../server";
-import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
+import { loginUser } from "../../redux/actions/user";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -17,27 +16,13 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    dispatch({ type: "LoadUserRequest" });
-
     try {
-      const res = await axios.post(
-        `${server}/user/login-user`,
-        { email, password },
-        { withCredentials: true }
-      );
-
-      dispatch({ type: "LoadUserSuccess", payload: res.data.user });
-
+      await dispatch(loginUser(email, password));
       toast.success("Login Success");
       navigate("/");
-      // window.location.reload(true);
     } catch (err) {
       console.error("Error:", err);
-
-      const errorMessage = err.response?.data?.message || "An unknown error occurred!";
-      dispatch({ type: "LoadUserFail", payload: errorMessage });
-
-      toast.error(errorMessage);
+      toast.error(err.response?.data?.message || "An unknown error occurred!");
     }
   };
 

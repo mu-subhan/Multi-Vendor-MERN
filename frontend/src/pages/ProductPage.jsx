@@ -8,53 +8,50 @@ import { useSelector } from "react-redux";
 import Loader from '../components/Layout/Loader';
 
 const ProductPage = () => {
-    const { products } = useSelector((state) => state.products);
-    const [searchParams] = useSearchParams();
-    const categoryData = searchParams.get("category");
-    const [data, setData] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+  const { allProducts, isLoading } = useSelector((state) => state.products);
+  const [searchParams] = useSearchParams();
+  const categoryData = searchParams.get("category");
+  const [data, setData] = useState([]);
 
-    useEffect(() => {
-        setIsLoading(true);
-        if (categoryData === null) {
-            setData(products);
-        } else {
-            const filteredProducts = products && products.filter((i) => i.category === categoryData);
-            setData(filteredProducts);
-        }
-        setIsLoading(false);
-    }, [products, categoryData]);
+  useEffect(() => {
+    if (categoryData === null) {
+      setData(allProducts);
+    } else {
+      const filteredProducts = allProducts && allProducts.filter((i) => i.category === categoryData);
+      setData(filteredProducts);
+    }
+  }, [allProducts, categoryData]);
 
-    return (
-        <div className="min-h-screen flex flex-col">
-            <Header activeHeading={3} />
-            <main className="flex-grow">
-                <div className={`${styles.section} py-8`}>
-                    {isLoading ? (
-                        <div className="flex justify-center items-center h-[50vh]">
-                            <Loader />
-                        </div>
-                    ) : (
-                        <>
-                            <div className='grid grid-cols-1 gap-[20px] md:grid-cols-2 md:gap-[25px] lg:grid-cols-4 lg:gap-[25px] xl:grid-cols-5 xl:gap-[30px] mb-12'>
-                                {data && data.map((i, index) => (
-                                    <ProductCard data={i} key={index} />
-                                ))}
-                            </div>
-                            {data && data.length === 0 && (
-                                <div className="w-full flex justify-center items-center">
-                                    <h1 className='text-center pb-[100px] text-[20px] text-gray-500'>
-                                        No Products Found
-                                    </h1>
-                                </div>
-                            )}
-                        </>
-                    )}
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header activeHeading={3} />
+      <main className="flex-grow">
+        <div className={`${styles.section} py-8`}>
+          {isLoading ? (
+            <div className="flex justify-center items-center h-[50vh]">
+              <Loader />
+            </div>
+          ) : (
+            <>
+              <div className='grid grid-cols-1 gap-[20px] md:grid-cols-2 md:gap-[25px] lg:grid-cols-4 lg:gap-[25px] xl:grid-cols-5 xl:gap-[30px] mb-12'>
+                {data && data.map((i, index) => (
+                  <ProductCard data={i} key={index} />
+                ))}
+              </div>
+              {data && data.length === 0 && (
+                <div className="w-full flex justify-center items-center">
+                  <h1 className='text-center pb-[100px] text-[20px] text-gray-500'>
+                    No Products Found
+                  </h1>
                 </div>
-            </main>
-            <Footer />
+              )}
+            </>
+          )}
         </div>
-    )
+      </main>
+      <Footer />
+    </div>
+  )
 }
 
 export default ProductPage

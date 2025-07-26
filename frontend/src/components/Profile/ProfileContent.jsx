@@ -15,6 +15,7 @@ import {toast} from "react-toastify";
 import { useDispatch } from "react-redux";
 import axios from "axios";
 import { RxCross1 } from "react-icons/rx";
+import { getAllOrdersOfUser } from "../../redux/actions/order";
 
 const ProfileContent = ({ active }) => {
 
@@ -248,20 +249,13 @@ const ProfileContent = ({ active }) => {
 };
 
 const AllOrders = () => {
-  const orders = [
-    {
-      _id: "7463hvbfbhfbrtr28820221",
-      orderItems: [{ name: "Iphone 14 pro max" }],
-      totalPrice: 120,
-      orderStatus: "Processing",
-    },
-    {
-      _id: "6348hvbfbhfbrtr12345021",
-      orderItems: [{ name: "Samsung Galaxy" }],
-      totalPrice: 150,
-      orderStatus: "Delivered",
-    },
-  ];
+  const {user} = useSelector((state)=>state.user);
+  const {orders} = useSelector((state)=>state.order);
+ const dispatch = useDispatch();
+
+ useEffect(()=>{
+  dispatch(getAllOrdersOfUser(user._id));
+ },[])
 
   const columns = [
     {
@@ -276,7 +270,6 @@ const AllOrders = () => {
       minWidth: 130,
       flex: 0.7,
       cellClassName: (params) => {
-        // Correct way to access the status value in the row
         return params.row.status === "Delivered" ? "greenColor" : "redColor";
       },
     },
@@ -300,7 +293,7 @@ const AllOrders = () => {
       minWidth: 150,
       sortable: false,
       renderCell: (params) => (
-        <Link to={`/order/${params.id}`}>
+        <Link to={`/user/order/${params.id}`}>
           <Button>
             <AiOutlineArrowRight size={20} />
           </Button>
@@ -311,9 +304,9 @@ const AllOrders = () => {
 
   const rows = orders.map((item) => ({
     id: item._id,
-    itemsQty: item.orderItems ? item.orderItems.length : 0,
+    itemsQty: item.cart ? item.cart.length : 0,
     total: "US$ " + item.totalPrice,
-    status: item.orderStatus,
+    status: item.status,
   }));
 
   return (
@@ -328,25 +321,29 @@ const AllOrders = () => {
   );
 };
 const AllRefundOrders = () => {
-  const orders = [
-    {
-      _id: "7463hvbfbhfbrtr28820221",
-      orderItems: [{ name: "Iphone 14 pro max" }],
-      totalPrice: 120,
-      orderStatus: "Processing",
-    },
-  ];
+  const { user } = useSelector((state) => state.user);
+  const { orders } = useSelector((state) => state.order);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getAllOrdersOfUser(user._id));
+  }, []);
+
+  const eligibleOrders =
+    orders && orders.filter((item) => item.status === "Processing refund");
 
   const columns = [
     { field: "id", headerName: "Order ID", minWidth: 150, flex: 0.7 },
+
     {
       field: "status",
       headerName: "Status",
       minWidth: 130,
       flex: 0.7,
       cellClassName: (params) => {
-        // Use params.row.status instead of params.getValue()
-        return params.row.status === "Delivered" ? "greenColor" : "redColor";
+        return params.row.status === "Delivered"
+          ? "greenColor"
+          : "redColor";
       },
     },
     {
@@ -356,6 +353,7 @@ const AllRefundOrders = () => {
       minWidth: 130,
       flex: 0.7,
     },
+
     {
       field: "total",
       headerName: "Total",
@@ -363,6 +361,7 @@ const AllRefundOrders = () => {
       minWidth: 130,
       flex: 0.8,
     },
+
     {
       field: " ",
       flex: 1,
@@ -383,20 +382,18 @@ const AllRefundOrders = () => {
       },
     },
   ];
-  
+
   const row = [];
-  
-  // Correctly mapping the orders
-  orders &&
-    orders.forEach((item) => {
+
+  eligibleOrders &&
+    eligibleOrders.forEach((item) => {
       row.push({
         id: item._id,
-        itemsQty: item.orderItems.length, // Corrected field to `orderItems`
+        itemsQty: item.cart.length,
         total: "US$ " + item.totalPrice,
-        status: item.orderStatus, // Corrected the field to `orderStatus`
+        status: item.status,
       });
     });
-  
 
   return (
     <div className="pl-8 pt-1">
@@ -404,54 +401,53 @@ const AllRefundOrders = () => {
         rows={row}
         columns={columns}
         pageSize={10}
+        autoHeight
         disableSelectionOnClick
       />
     </div>
   );
 };
 
-const TrackOrder =()=>{
-  const orders = [
-    {
-      _id: "7463hvbfbhfbrtr28820221",
-      orderItems: [{ name: "Iphone 14 pro max" }],
-      totalPrice: 120,
-      orderStatus: "Processing",
-    },
-    {
-      _id: "6348hvbfbhfbrtr12345021",
-      orderItems: [{ name: "Samsung Galaxy" }],
-      totalPrice: 150,
-      orderStatus: "Delivered",
-    },
-  ];
+const TrackOrder = () => {
+  const { user } = useSelector((state) => state.user);
+  const { orders } = useSelector((state) => state.order);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getAllOrdersOfUser(user._id));
+  }, []);
+
   const columns = [
-    { field:"id",headerName:"Order ID",minWidth:150,flex:0.7},
+    { field: "id", headerName: "Order ID", minWidth: 150, flex: 0.7 },
+
     {
       field: "status",
       headerName: "Status",
       minWidth: 130,
       flex: 0.7,
       cellClassName: (params) => {
-        // Correct way to access the status value in the row
-        return params.row.status === "Delivered" ? "greenColor" : "redColor";
+        return params.row.status === "Delivered"
+          ? "greenColor"
+          : "redColor";
       },
     },
     {
       field: "itemsQty",
-      headerName: "Item Qty",
+      headerName: "Items Qty",
       type: "number",
       minWidth: 130,
       flex: 0.7,
     },
+
     {
       field: "total",
       headerName: "Total",
       type: "number",
       minWidth: 130,
-      flex: 0.7, // Adjust this so the column is visible
+      flex: 0.8,
     },
-     {
+
+    {
       field: " ",
       flex: 1,
       minWidth: 150,
@@ -461,24 +457,24 @@ const TrackOrder =()=>{
       renderCell: (params) => {
         return (
           <>
-            <Link to={`/order/${params.id}`}>
+            <Link to={`/user/track/order/${params.id}`}>
               <Button>
-                <MdOutlineTrackChanges size={20} />
+                <MdTrackChanges size={20} />
               </Button>
             </Link>
           </>
         );
       },
     },
-  ]
+  ];
 
-  const row =[];
+  const row = [];
 
-   orders &&
+  orders &&
     orders.forEach((item) => {
       row.push({
         id: item._id,
-        itemsQty: item.orderItems.length,
+        itemsQty: item.cart.length,
         total: "US$ " + item.totalPrice,
         status: item.status,
       });
@@ -486,7 +482,7 @@ const TrackOrder =()=>{
 
   return (
     <div className="pl-8 pt-1">
- <DataGrid
+      <DataGrid
         rows={row}
         columns={columns}
         pageSize={10}
@@ -494,8 +490,8 @@ const TrackOrder =()=>{
         autoHeight
       />
     </div>
-  )
-}
+  );
+};
 
 const ChangePassword =()=>{
    const [oldPassword, setOldPassword] = useState("");
