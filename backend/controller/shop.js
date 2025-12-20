@@ -146,13 +146,13 @@ router.post("/login-shop", catchAsyncError(async (req, res, next) => {
         }
 
         // Log the attempt
-        console.log(`Login attempt for shop with email: ${email}`);
+        // console.log(`Login attempt for shop with email: ${email}`);
 
         // Find shop with email and include password in the result
         const shop = await Shop.findOne({ email }).select("+password");
         
         if (!shop) {
-            console.log(`No shop found with email: ${email}`);
+            // console.log(`No shop found with email: ${email}`);
             return next(new ErrorHandler("Shop not found with this email", 401));
         }
 
@@ -163,7 +163,7 @@ router.post("/login-shop", catchAsyncError(async (req, res, next) => {
         try {
             isPasswordValid = await shop.comparePassword(password);
         } catch (error) {
-            console.error(`Password comparison error for shop ${email}:`, error);
+            // console.error(`Password comparison error for shop ${email}:`, error);
             return next(new ErrorHandler("Error verifying password", 500));
         }
 
@@ -172,7 +172,7 @@ router.post("/login-shop", catchAsyncError(async (req, res, next) => {
             return next(new ErrorHandler("Invalid email or password", 401));
         }
 
-        console.log(`Login successful for shop: ${email}`);
+        // console.log(`Login successful for shop: ${email}`);
         
         // Send token
         try {

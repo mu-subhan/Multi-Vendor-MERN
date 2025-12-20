@@ -23,7 +23,7 @@ const Header = ({ activeHeading }) => {
   const { cart } = useSelector((state) => state.cart);
   const { wishlist } = useSelector((state) => state.wishlist);
   const [searchTerm, setSearchTerm] = useState("");
-  const {isSeller } = useSelector((state)=>state.seller)
+  const { isSeller } = useSelector((state) => state.seller)
   const [searchData, setSearchData] = useState(null);
   const [active, setActive] = useState(false);
   const [dropDown, setDropDown] = useState(false);
@@ -53,26 +53,27 @@ const Header = ({ activeHeading }) => {
   // Update the profile image rendering in both mobile and desktop views
   const renderProfileImage = () => {
     if (loading) return null;
-    
+
+    {console.log(`${user?.avatar?.url}`)}
     if (isAuthenticated && user) {
       return (
         <Link to="/profile">
-          <div className="w-8 h-9 rounded-full border-[3px] border-[#0eae88] overflow-hidden">
-  <img
-    src={user?.avatar?.url || "/default-avatar.png"}
-    alt="profile"
-    className="w-full h-full object-cover"
-  />
-</div>
+          <div className="w-10 h-10 rounded-full border-[2px] border-[#0eae88] overflow-hidden">
+            <img
+              src={`${user?.avatar?.url}`}
+              alt="picture"
+              className="w-full h-full object-cover"
+            />
+          </div>
 
         </Link>
       );
     }
-    
+
     return (
       <>
         <Link to="/login" className="text-[18px] pr-[10px] text-[#000000b7]">
-         <FaUserCircle className="w-12 h-12 mt-4" color="#fff" />
+          <FaUserCircle className="w-10 h-11 mt-4" color="#fff" />
         </Link>
         {/* <Link to="/sign-up" className="text-[18px] text-[#000000b7]">
           Sign up
@@ -110,7 +111,7 @@ const Header = ({ activeHeading }) => {
               <div className="absolute min-h-[30vh] bg-slate-50 shadow-sm-2 z-[9] p-4">
                 {searchData &&
                   searchData.map((i, index) => {
-                  
+
                     return (
                       <Link to={`/product/${i._id}`}>
                         <div className="w-full flex items-start-py-3">
@@ -132,7 +133,7 @@ const Header = ({ activeHeading }) => {
           <div className={`${styles.button}`}>
             <Link to={`${isSeller ? "/dashboard" : "/shop-create"}`}>
               <h1 className="text-[#fff] flex items-center">
-               {isSeller ?  "Seller Dashboard": "Become Seller "}  <IoIosArrowForward className="ml-1" />
+                {isSeller ? "Seller Dashboard" : "Become Seller "}  <IoIosArrowForward className="ml-1" />
               </h1>
             </Link>
           </div>
@@ -144,10 +145,9 @@ const Header = ({ activeHeading }) => {
 
       {/* mobile header */}
 
-       <div
-        className={`${
-          active === true ? "shadow-sm fixed top-0 left-0 z-10" : null
-        }
+      <div
+        className={`${active === true ? "shadow-sm fixed top-0 left-0 z-10" : null
+          }
       w-full h-[60px] bg-[#fff] z-50 top-0 left-0 shadow-sm 800px:hidden`}
       >
         <div className="w-full flex items-center justify-between">
@@ -170,8 +170,8 @@ const Header = ({ activeHeading }) => {
           <div>
             <div className="relative mr-[20px]">
               <AiOutlineShoppingCart size={30} />
-              <span class="absolute right-0 top-0 rounded-full bg-[#3bc177] w-4 h-4 top right p-0 m-0 text-white font-mono text-[12px]  leading-tight text-center">
-                {cart && cart.length} 
+              <span className="absolute right-0 top-0 rounded-full bg-[#3bc177] w-4 h-4 top right p-0 m-0 text-white font-mono text-[12px]  leading-tight text-center">
+                {cart && cart.length}
               </span>
             </div>
           </div>
@@ -183,80 +183,79 @@ const Header = ({ activeHeading }) => {
         <div className={`fixed w-full bg-[#0000005f] z-20 h-full top-0 left-0`}>
           <div className="fixed w-[70%] bg-[#fff] h-screen top-0 left-0 z-10 overflow-y-scroll">
             {/* overflow-y-scroll */}
-           
+
             <div className="w-full justify-between flex pr-3">
               <div>
                 <div
                   className="relative mr-[15px]"
                   onClick={() => setOpenWishlist(true) || setOpen(false)}
                 >
-  
+
                   <AiOutlineHeart size={30} className="mt-5 ml-5" />
                   <span class="absolute right-0 top-0 rounded-full bg-[#3bc177] w-4 h-4 top right p-0 m-0 text-white font-mono text-[12px]  leading-tight text-center">
                     {wishlist && wishlist.length}1
                   </span>
-                </div> 
+                </div>
               </div>
-               <RxCross1
-                  size={30}
-                  className="ml-4 mt-5"
-                  onClick={() => setOpen(false)}
-                />
+              <RxCross1
+                size={30}
+                className="ml-4 mt-5"
+                onClick={() => setOpen(false)}
+              />
             </div>
-           <div className="my-8 w-[92%] m-auto h-[40px relative]">
-                <input
-                  type="search"
-                  placeholder="Search Product..."
-                  className="h-[40px] w-full px-2 border-[#3957db] border-[2px] rounded-md"
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                />
-{searchData && (
-                  <div className="absolute bg-[#fff] z-10 shadow w-full left-0 p-3">
-                    {searchData.map((i) => {
-                    
-                      return (
-                        <Link to={`/product/${i._id}`}>
-                          <div className="flex items-center">
-                            <img
-                              src={i.image_Url[0]?.url}
-                              alt=""
-                              className="w-[50px] mr-2"
-                            />
-                            <h5>{i.name}</h5>
-                          </div>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                )}
-            </div>
- 
-         <Navbar active={activeHeading} />
-         <div className={`${styles.button} ml-4 !rounded-[4px]`}>
-          <Link
-          to='/shop-create'> 
-            <h1 className="text-[#fff] flex items-center">
-            Become Seller
-            <IoIosArrowForward className="ml-1"/>
-            </h1>
-          </Link>
-         </div>
-          <br />
-              <br />
-              <br />
+            <div className="my-8 w-[92%] m-auto h-[40px relative]">
+              <input
+                type="search"
+                placeholder="Search Product..."
+                className="h-[40px] w-full px-2 border-[#3957db] border-[2px] rounded-md"
+                value={searchTerm}
+                onChange={handleSearchChange}
+              />
+              {searchData && (
+                <div className="absolute bg-[#fff] z-10 shadow w-full left-0 p-3">
+                  {searchData.map((i) => {
 
-              <div className="flex w-full justify-center">
-                {renderProfileImage()}
-              </div>
+                    return (
+                      <Link to={`/product/${i._id}`}>
+                        <div className="flex items-center">
+                          <img
+                            src={i.image_Url[0]?.url}
+                            alt=""
+                            className="w-[50px] mr-2"
+                          />
+                          <h5>{i.name}</h5>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            <Navbar active={activeHeading} />
+            <div className={`${styles.button} ml-4 !rounded-[4px]`}>
+              <Link
+                to='/shop-create'>
+                <h1 className="text-[#fff] flex items-center">
+                  Become Seller
+                  <IoIosArrowForward className="ml-1" />
+                </h1>
+              </Link>
+            </div>
+            <br />
+            <br />
+            <br />
+
+            <div className="flex w-full justify-center">
+              {renderProfileImage()}
             </div>
           </div>
+        </div>
       )}
 
       <div
-        className={`${
-          active === true ? "shadow-sm fixed top-0 left-0 z-10" : null
-        } transition hidden 800px:flex items-center justify-between w-full bg-gray-800 h-[70px]`}
+        className={`${active === true ? "shadow-sm fixed top-0 left-0 z-10" : null
+          } transition hidden 800px:flex items-center justify-between w-full bg-gray-800 h-[70px]`}
       >
         <div className={`flex items-center justify-between px-8`}>
           {/* categories */}
@@ -332,7 +331,7 @@ const Header = ({ activeHeading }) => {
           </div>
         </div>
       </div>
-    </> 
+    </>
   );
 };
 

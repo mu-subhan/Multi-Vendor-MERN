@@ -221,7 +221,7 @@ const getImageUrl = (image) => {
                 <div className="flex items-center pt-8">
                   <Link to={`/shop/${data?.shop._id}`}>
 
-                    {console.log("Image URL:", getImageUrl(data.shop?.avatar?.url))}
+                    {/* {console.log("Image URL:", getImageUrl(data.shop?.avatar?.url))} */}
                     <img
                       src={getImageUrl(data.shop?.avatar?.url)}
                       alt="Shop image"
@@ -468,10 +468,9 @@ const ProductDetailsInfo = ({
           <div className="w-full 800px:w-[50%]">
             <Link to={`/shop/preview/${data.shop._id}`}>
               <div className="flex items-center">
-                {/* {console.log("Shop Avatar URL:", `${backend_url}uploads/${data?.shop?.avatar?.url}`)} */}
-                {console.log("Shop Avatar URL:", data?.shop?.avatar?.url)}
+               
                <img
-    src={getImageUrl(data?.shop?.avatar?.url)}
+    src={getImageUrl(data.shop?.avatar?.url)}
     className="w-[50px] h-[50px] rounded-full"
     alt="Shop Avatar"
 />

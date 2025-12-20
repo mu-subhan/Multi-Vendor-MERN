@@ -46,11 +46,13 @@ const storage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    const filename = file.originalname.split(".")[0];
-    const extname = path.extname(file.originalname);
-    cb(null, filename + "-" + uniqueSuffix + extname);
-  }
+  const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+  const sanitizedOriginalName = file.originalname.replace(/\s+/g, "-");
+  const name = path.parse(sanitizedOriginalName).name;
+  const ext = path.extname(sanitizedOriginalName);
+  cb(null, name + "-" + uniqueSuffix + ext);
+}
+
 });
 
 const fileFilter = (req, file, cb) => {
