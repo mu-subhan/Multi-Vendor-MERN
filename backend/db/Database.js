@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const connectDatabase = () => {
     const DB_URI= process.env.DB_URL;
     if(DB_URI){
-        console.log(DB_URI,"DB_URI")
+        // console.log(DB_URI,"DB_URI")
         mongoose.connect(process.env.DB_URL
         //      {
         //     useNewUrlParser: true,
