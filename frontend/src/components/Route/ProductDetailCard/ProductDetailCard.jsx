@@ -79,7 +79,7 @@ const ProductDetailsCard = ({ setOpen, data }) => {
     }
     
     // If it's just a filename from the backend
-    return `${backend_url}/uploads/${image}`;
+    return `${backend_url}uploads/${image}`;
   };
 
   return (
@@ -95,9 +95,10 @@ const ProductDetailsCard = ({ setOpen, data }) => {
 
             <div className="block w-full 800px:flex">
               <div className="w-full 800px:w-[50%]">
+               
                 <img 
-                  src={getImageUrl(data.images && data.images[0])} 
-                  alt={data.name}
+                  src={getImageUrl(data?.images && data.images[0]?.url)} 
+                  alt="product"
                   className="w-full h-[350px] object-contain"
                   onError={(e) => {
                     e.target.onerror = null;
@@ -106,6 +107,8 @@ const ProductDetailsCard = ({ setOpen, data }) => {
                 />
                 <div className="flex">
                   <Link to={`/shop/preview/${data.shop._id}`} className="flex">
+{console.log("Shop Avatar URL:", (data))}
+                  {/* {console.log("Shop Avatar URL:", getImageUrl(data.shop?.avatar))} */}
                     <img
                       src={getImageUrl(data.shop?.avatar)}
                       alt={data.shop?.name}

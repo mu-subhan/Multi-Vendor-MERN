@@ -32,17 +32,17 @@ export const createevent = (newForm) => async (dispatch) =>{
 export const getAllEventsShop = (id) => async (dispatch) => {
   try {
     dispatch({
-      type: "getAllEventsShopRequest",
+      type: "getAlleventsShopRequest",
     });
 
     const { data } = await axios.get(`${server}/event/get-all-events/${id}`);
     dispatch({
-      type: "getAllEventsShopSuccess",
+      type: "getAlleventsShopSuccess",
       payload: data.events,
     });
   } catch (error) {
     dispatch({
-      type: "getAllEventsShopFailed",
+      type: "getAlleventsShopFailed",
       payload: error.response.data.message,
     });
   }

@@ -54,11 +54,10 @@ const DashboardHeader = () => {
             />
           </Link>
           {!isLoading && seller && (
-    console.log(seller, "seller in dashboard header"),
     <Link to={`/shop/${seller._id}`}>
       <img
-        src={seller?.avatar?.url ? seller.avatar.url : "/default-avatar.png"}
-        alt="no avatar"
+        src={`${seller.avatar?.url}`}
+        alt="seller-avatar" 
         className="w-[50px] h-[50px] rounded-full object-cover"
       />
     </Link>
